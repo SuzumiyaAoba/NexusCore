@@ -1,0 +1,7 @@
+# deps
+node_modules/
+dist/
+todo.db
+
+### Claude ###
+.claude/settings.local.json
