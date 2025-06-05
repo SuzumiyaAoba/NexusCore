@@ -19,18 +19,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 ### Essential Commands
+
 - `bun run dev` - Start development server with hot reload
 - `bun run build` - Type check and build for production
-- `bun run type-check` - Run TypeScript type checking only
+- `bun run typecheck` - Run TypeScript type checking only
 - `bun run start` - Start production server
 - `bun test` - Run all tests
 - `bun test <filename>` - Run specific test file
 
 ### Code Quality
+
 - `bun run lint` - Run Biome linter
 - `bun run format` - Format code with Biome (auto-fix)
 
 ### Database Management
+
 - `bun run generate` - Generate Drizzle migrations
 - `bun run migrate` - Run database migrations
 - `bun run studio` - Launch Drizzle Studio for database inspection
@@ -38,6 +41,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Architecture Overview
 
 ### Domain-Driven Design Structure
+
 The codebase follows DDD principles with clean separation of concerns:
 
 - **`src/entities/`** - Domain models with business logic and repositories (User, Task)
@@ -48,13 +52,16 @@ The codebase follows DDD principles with clean separation of concerns:
 ### Key Architectural Patterns
 
 **Result Type Pattern**: Functional error handling throughout the application
+
 ```typescript
 type Result<T, E = Error> = Success<T> | Failure<E>;
 ```
+
 - Eliminates try/catch in business logic
 - Enables chainable operations with compile-time error safety
 
 **Type-Safe API Routes**: Custom RouteBuilder pattern with Hono + Zod
+
 ```typescript
 routes.post("/api/tasks", {
   body: createTaskRequestSchema,
@@ -65,18 +72,25 @@ routes.post("/api/tasks", {
 ```
 
 **Enhanced Error System**: Structured errors with HTTP status mapping
+
 - Type-safe error codes and automatic HTTP status resolution
 - Consistent error responses across all endpoints
 
 **Domain Namespaces**: Business logic encapsulated in TypeScript namespaces
+
 ```typescript
 export namespace TaskDomain {
-  export function calculateEisenhowerQuadrant(importance: boolean, urgency: boolean): EisenhowerQuadrant
+  export function calculateEisenhowerQuadrant(
+    importance: boolean,
+    urgency: boolean
+  ): EisenhowerQuadrant;
 }
 ```
 
 ### Database Design
+
 Sophisticated SQLite schema with Drizzle ORM providing:
+
 - **Type-safe queries**: Full compile-time type checking for all database operations
 - **Complex relationships**: Tasks with subtasks, assignments, tags, and dependencies
 - **Soft deletion**: Built-in trash/restore functionality for tasks
@@ -84,14 +98,18 @@ Sophisticated SQLite schema with Drizzle ORM providing:
 - **Business rules**: Eisenhower Matrix auto-calculation, task status transitions
 
 ### Dependency Injection
+
 TSyringe is configured but **not currently used** - the codebase uses manual dependency injection:
+
 ```typescript
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 ```
+
 Decorators are enabled for future TSyringe adoption.
 
 ### Testing Patterns
+
 - **Domain-focused testing**: Unit tests for business logic and validation
 - **Result pattern testing**: Type-safe error and success case validation
 - **Integration ready**: Test setup supports database migrations
@@ -99,7 +117,9 @@ Decorators are enabled for future TSyringe adoption.
 ## Development Workflow
 
 ### Working with the Result Pattern
+
 Always handle both success and failure cases when working with domain operations:
+
 ```typescript
 const result = UserDomain.validateCreate(userData);
 if (!result.success) {
@@ -109,6 +129,7 @@ if (!result.success) {
 ```
 
 ### Adding New Features
+
 1. **Domain First**: Define business logic in `src/entities/{domain}/model/`
 2. **Repository Layer**: Add data access methods in `src/entities/{domain}/api/repository.ts`
 3. **Application Service**: Create orchestration logic in `src/features/{feature}/api/service.ts`
@@ -116,6 +137,7 @@ if (!result.success) {
 5. **Testing**: Add tests for domain logic and API endpoints
 
 ### Database Changes
+
 1. Modify schema in `src/shared/lib/db/schema.ts`
 2. Generate migration: `bun run generate`
 3. Apply migration: `bun run migrate`
@@ -124,7 +146,8 @@ if (!result.success) {
 ## Specification Reference
 
 Refer to `docs/仕様書.md` for the complete Japanese API specification document, which includes:
-- Detailed database schema with ER diagrams  
+
+- Detailed database schema with ER diagrams
 - Complete API endpoint definitions
 - Data validation rules and business logic
 - Comprehensive feature requirements including advanced analytics and reporting capabilities
