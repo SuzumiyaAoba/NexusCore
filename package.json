@@ -27,7 +27,6 @@
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.43.1",
     "hono": "^4.7.4",
-    "lint-staged": "^15.5.0",
     "reflect-metadata": "^0.2.2",
     "sqlite3": "^5.1.7",
     "tslog": "^4.9.3",
@@ -40,6 +39,7 @@
     "@tsconfig/strictest": "^2.0.5",
     "@types/bun": "latest",
     "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
     "typescript": "^5.8.2"
   },
   "lint-staged": {
