@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "hono/jsx",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "esnext",
+    "lib": ["esnext"],
+    "forceConsistentCasingInFileNames": true,
+    "outDir": "dist",
+    "rootDir": "src",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": false,
+    "noImplicitReturns": false,
+    "noImplicitThis": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"],
+  "ts-node": {
+    "compilerOptions": {
+      "skipLibCheck": true
+    }
+  }
+}
