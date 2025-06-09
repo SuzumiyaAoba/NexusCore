@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 export const createTaskRequestSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().optional(),
+  title: z.string().min(1).max(500),
+  description: z.string().max(5000).optional(),
   status: z.enum(["TODO", "DOING", "PENDING", "DONE"]).optional(),
   priority: z.enum(["low", "medium", "high"]).optional(),
   importance: z.boolean().optional(),
@@ -11,7 +11,7 @@ export const createTaskRequestSchema = z.object({
   categoryId: z.number().optional(),
   parentId: z.number().optional(),
   assignedTo: z.number().optional(),
-  assignmentNote: z.string().optional(),
+  assignmentNote: z.string().max(1000).optional(),
   estimatedTime: z.number().optional(),
   scheduledStartDate: z.string().optional(),
   scheduledEndDate: z.string().optional(),
@@ -20,8 +20,8 @@ export const createTaskRequestSchema = z.object({
 });
 
 export const updateTaskRequestSchema = z.object({
-  title: z.string().min(1).optional(),
-  description: z.string().optional(),
+  title: z.string().min(1).max(500).optional(),
+  description: z.string().max(5000).optional(),
   status: z.enum(["TODO", "DOING", "PENDING", "DONE"]).optional(),
   priority: z.enum(["low", "medium", "high"]).optional(),
   importance: z.boolean().optional(),
@@ -29,7 +29,7 @@ export const updateTaskRequestSchema = z.object({
   projectId: z.number().optional(),
   categoryId: z.number().optional(),
   assignedTo: z.number().optional(),
-  assignmentNote: z.string().optional(),
+  assignmentNote: z.string().max(1000).optional(),
   estimatedTime: z.number().optional(),
   progress: z.number().min(0).max(100).optional(),
   scheduledStartDate: z.string().optional(),
@@ -39,14 +39,14 @@ export const updateTaskRequestSchema = z.object({
 });
 
 export const createUserRequestSchema = z.object({
-  username: z.string().min(1),
-  displayName: z.string().min(1),
+  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscore, and hyphen"),
+  displayName: z.string().min(1).max(100),
   email: z.string().email(),
   avatarUrl: z.string().optional(),
 });
 
 export const updateUserRequestSchema = z.object({
-  displayName: z.string().min(1).optional(),
+  displayName: z.string().min(1).max(100).optional(),
   email: z.string().email().optional(),
   avatarUrl: z.string().optional(),
 });
@@ -60,20 +60,20 @@ export const taskQuerySchema = z.object({
   projectId: z.number().optional(),
   parentId: z.number().optional(),
   priority: z.enum(["low", "medium", "high"]).optional(),
-  search: z.string().optional(),
+  search: z.string().max(200).optional(),
   createdBy: z.number().optional(),
   assignedTo: z.number().optional(),
   includeDeleted: z.boolean().optional(),
   deletedOnly: z.boolean().optional(),
   sortBy: z.string().optional(),
   order: z.enum(["asc", "desc"]).optional(),
-  limit: z.coerce.number().int().min(1).max(100).optional(),
-  offset: z.coerce.number().int().min(0).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
 });
 
 export const paginationQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).optional(),
-  offset: z.coerce.number().int().min(0).optional(),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
 });
 
 export type CreateTaskRequest = z.infer<typeof createTaskRequestSchema>;

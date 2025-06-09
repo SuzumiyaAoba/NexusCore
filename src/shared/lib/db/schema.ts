@@ -121,6 +121,14 @@ export const tasks = sqliteTable(
     dueDateIdx: index("idx_tasks_due_date").on(table.dueDate),
     deletedAtIdx: index("idx_tasks_deleted_at").on(table.deletedAt),
     createdAtIdx: index("idx_tasks_created_at").on(table.createdAt),
+    // Composite indexes for common query patterns
+    statusCreatedAtIdx: index("idx_tasks_status_created_at").on(table.status, table.createdAt),
+    assignedToStatusIdx: index("idx_tasks_assigned_to_status").on(table.assignedTo, table.status),
+    projectStatusIdx: index("idx_tasks_project_status").on(table.projectId, table.status),
+    categoryStatusIdx: index("idx_tasks_category_status").on(table.categoryId, table.status),
+    eisenhowerStatusIdx: index("idx_tasks_eisenhower_status").on(table.eisenhowerQuadrant, table.status),
+    dueDateStatusIdx: index("idx_tasks_due_date_status").on(table.dueDate, table.status),
+    statusNotDeletedIdx: index("idx_tasks_status_not_deleted").on(table.status, table.deletedAt),
   }),
 );
 

@@ -21,7 +21,7 @@ export function validateJson<T>(schema: z.ZodSchema<T>) {
               })),
             },
           },
-          400 as any,
+          400,
         );
       }
       return c.json(
@@ -57,7 +57,7 @@ export function validateQuery<T>(schema: z.ZodSchema<T>) {
               })),
             },
           },
-          400 as any,
+          400,
         );
       }
       return c.json(
@@ -67,7 +67,7 @@ export function validateQuery<T>(schema: z.ZodSchema<T>) {
             message: "Unexpected error during query validation",
           },
         },
-        500 as any,
+        500,
       );
     }
   };
@@ -93,7 +93,7 @@ export function validateParams<T>(schema: z.ZodSchema<T>) {
               })),
             },
           },
-          400 as any,
+          400,
         );
       }
       return c.json(
@@ -103,7 +103,7 @@ export function validateParams<T>(schema: z.ZodSchema<T>) {
             message: "Unexpected error during parameter validation",
           },
         },
-        500 as any,
+        500,
       );
     }
   };
