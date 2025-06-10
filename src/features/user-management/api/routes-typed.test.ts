@@ -1,9 +1,9 @@
 import { describe, expect, test } from "bun:test";
 import { Hono } from "hono";
-import { userRoutesTyped as userRoutes } from "./routes-typed";
+import { setupUserRoutes } from "./routes-typed";
 
 const app = new Hono();
-app.route("/", userRoutes);
+setupUserRoutes(app);
 
 describe("User Management API Integration Tests", () => {
   describe("Validation Tests", () => {

@@ -1,20 +1,20 @@
 import { Database } from "bun:sqlite";
+import * as path from "node:path";
 import { drizzle } from "drizzle-orm/bun-sqlite";
-import path from "path";
 
 // Configure database path with proper error handling
 const getDatabasePath = (): string => {
   if (process.env.NODE_ENV === "test") {
     return ":memory:";
   }
-  
-  const dbPath = process.env.DATABASE_URL || "data/todo.db";
-  
-  // Ensure the data directory exists
+
+  const dbPath = process.env.DATABASE_URL || "todo.db";
+
+  // Ensure thesrc/shared/config/database.ts data directory exists
   if (!dbPath.startsWith(":memory:") && !path.isAbsolute(dbPath)) {
     return path.resolve(process.cwd(), dbPath);
   }
-  
+
   return dbPath;
 };
 
@@ -23,10 +23,10 @@ let database: Database;
 try {
   const dbPath = getDatabasePath();
   database = new Database(dbPath);
-  
+
   // Enable foreign key constraints
   database.exec("PRAGMA foreign_keys = ON;");
-  
+
   // Enable WAL mode for better concurrency
   if (process.env.NODE_ENV !== "test") {
     database.exec("PRAGMA journal_mode = WAL;");

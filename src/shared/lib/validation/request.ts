@@ -39,7 +39,11 @@ export const updateTaskRequestSchema = z.object({
 });
 
 export const createUserRequestSchema = z.object({
-  username: z.string().min(3).max(50).regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscore, and hyphen"),
+  username: z
+    .string()
+    .min(3)
+    .max(50)
+    .regex(/^[a-zA-Z0-9_-]+$/, "Username can only contain letters, numbers, underscore, and hyphen"),
   displayName: z.string().min(1).max(100),
   email: z.string().email(),
   avatarUrl: z.string().optional(),

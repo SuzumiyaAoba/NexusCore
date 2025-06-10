@@ -2,8 +2,14 @@
  * Base error class with error codes
  */
 export abstract class AppError extends Error {
-  abstract readonly code: string;
-  abstract readonly statusCode: number;
+  abstract readonly code:
+    | "DATABASE_ERROR"
+    | "NOT_FOUND"
+    | "VALIDATION_ERROR"
+    | "DUPLICATE_ERROR"
+    | "AUTHENTICATION_ERROR"
+    | "AUTHORIZATION_ERROR";
+  abstract readonly statusCode: 400 | 401 | 403 | 404 | 409 | 500;
 
   constructor(
     message: string,
@@ -26,12 +32,12 @@ export abstract class AppError extends Error {
 
 export class DatabaseError extends AppError {
   readonly code = "DATABASE_ERROR" as const;
-  readonly statusCode = 500;
+  readonly statusCode = 500 as const;
 }
 
 export class NotFoundError extends AppError {
   readonly code = "NOT_FOUND" as const;
-  readonly statusCode = 404;
+  readonly statusCode = 404 as const;
 
   constructor(
     public readonly resource: string,
@@ -43,7 +49,7 @@ export class NotFoundError extends AppError {
 
 export class ValidationError extends AppError {
   readonly code = "VALIDATION_ERROR" as const;
-  readonly statusCode = 400;
+  readonly statusCode = 400 as const;
 
   constructor(
     message: string,
@@ -56,7 +62,7 @@ export class ValidationError extends AppError {
 
 export class DuplicateError extends AppError {
   readonly code = "DUPLICATE_ERROR" as const;
-  readonly statusCode = 409;
+  readonly statusCode = 409 as const;
 
   constructor(
     public readonly resource: string,
@@ -69,7 +75,7 @@ export class DuplicateError extends AppError {
 
 export class AuthenticationError extends AppError {
   readonly code = "AUTHENTICATION_ERROR" as const;
-  readonly statusCode = 401;
+  readonly statusCode = 401 as const;
 
   constructor(message = "Authentication required") {
     super(message);
@@ -78,7 +84,7 @@ export class AuthenticationError extends AppError {
 
 export class AuthorizationError extends AppError {
   readonly code = "AUTHORIZATION_ERROR" as const;
-  readonly statusCode = 403;
+  readonly statusCode = 403 as const;
 
   constructor(message = "Insufficient permissions") {
     super(message);

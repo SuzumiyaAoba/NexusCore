@@ -161,7 +161,10 @@ describe("Task Management API", () => {
 
         const response = await app.request("/api/tasks", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": userId?.toString() || "1",
+          },
           body: JSON.stringify(taskData),
         });
 
@@ -201,7 +204,7 @@ describe("Task Management API", () => {
       const result = (await response.json()) as PaginatedTasksResponse;
       expect(result.data).toEqual([]);
       expect(result.total).toBe(0);
-      expect(result.limit).toBe(50);
+      expect(result.limit).toBe(20);
       expect(result.offset).toBe(0);
     });
 
@@ -215,7 +218,10 @@ describe("Task Management API", () => {
       for (const taskData of tasks) {
         await app.request("/api/tasks", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": userId?.toString() || "1",
+          },
           body: JSON.stringify(taskData),
         });
       }
@@ -234,13 +240,19 @@ describe("Task Management API", () => {
       // Create tasks with different statuses
       const task1 = await app.request("/api/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": userId?.toString() || "1",
+        },
         body: JSON.stringify({ title: "Task 1", status: "TODO" }),
       });
 
       const task2 = await app.request("/api/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": userId?.toString() || "1",
+        },
         body: JSON.stringify({ title: "Task 2", status: "DOING" }),
       });
 
@@ -256,13 +268,19 @@ describe("Task Management API", () => {
       // Create tasks with different priorities
       await app.request("/api/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": userId?.toString() || "1",
+        },
         body: JSON.stringify({ title: "Task 1", priority: "high" }),
       });
 
       await app.request("/api/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": userId?.toString() || "1",
+        },
         body: JSON.stringify({ title: "Task 2", priority: "low" }),
       });
 
@@ -278,13 +296,19 @@ describe("Task Management API", () => {
       // Create tasks
       await app.request("/api/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": userId?.toString() || "1",
+        },
         body: JSON.stringify({ title: "Important meeting" }),
       });
 
       await app.request("/api/tasks", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": userId?.toString() || "1",
+        },
         body: JSON.stringify({ title: "Code review" }),
       });
 
