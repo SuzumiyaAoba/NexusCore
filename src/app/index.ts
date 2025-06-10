@@ -1,5 +1,4 @@
-import { taskRoutesTyped } from "@/features/task-management/api/routes-typed";
-// import { taskRoutesTyped } from "@/features/task-management/api/routes-typed";
+import { setupTaskRoutes } from "@/features/task-management/api/routes-typed";
 import { setupUserRoutes } from "@/features/user-management/api/routes-typed";
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
@@ -40,9 +39,7 @@ app.onError((err, c) => {
 });
 
 // Register typed routes
-// app.route("/", userRoutesTyped);
-app.route("/", taskRoutesTyped);
-
+setupTaskRoutes(app);
 setupUserRoutes(app);
 // Basic API documentation endpoint
 app.get(

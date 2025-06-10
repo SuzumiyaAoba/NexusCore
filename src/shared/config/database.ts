@@ -8,9 +8,9 @@ const getDatabasePath = (): string => {
     return ":memory:";
   }
 
-  const dbPath = process.env.DATABASE_URL || "todo.db";
+  const dbPath = process.env.DATABASE_URL || "data/todo.db";
 
-  // Ensure thesrc/shared/config/database.ts data directory exists
+  // Ensure the data directory exists
   if (!dbPath.startsWith(":memory:") && !path.isAbsolute(dbPath)) {
     return path.resolve(process.cwd(), dbPath);
   }

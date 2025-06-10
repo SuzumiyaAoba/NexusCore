@@ -26,23 +26,7 @@ const setupUserRoutes = (app: Hono) => {
         },
       },
     }),
-    zValidator("json", createUserRequestSchema, (result, c) => {
-      if (!result.success) {
-        return c.json(
-          {
-            error: {
-              code: "VALIDATION_ERROR",
-              message: "Validation failed",
-              details: result.error.errors.map((error) => ({
-                field: error.path.join("."),
-                message: error.message,
-              })),
-            },
-          },
-          400,
-        );
-      }
-    }),
+    zValidator("json", createUserRequestSchema),
     async (c) => {
       const userData = c.req.valid("json");
       const result = await userService.createUser(userData);
@@ -79,23 +63,7 @@ const setupUserRoutes = (app: Hono) => {
         },
       },
     }),
-    zValidator("query", paginationQuerySchema, (result, c) => {
-      if (!result.success) {
-        return c.json(
-          {
-            error: {
-              code: "VALIDATION_ERROR",
-              message: "Validation failed",
-              details: result.error.errors.map((error) => ({
-                field: error.path.join("."),
-                message: error.message,
-              })),
-            },
-          },
-          400,
-        );
-      }
-    }),
+    zValidator("query", paginationQuerySchema),
     async (c) => {
       const query = c.req.valid("query");
       const result = await userService.getUsers(query);
@@ -127,23 +95,7 @@ const setupUserRoutes = (app: Hono) => {
         },
       },
     }),
-    zValidator("param", idParamSchema, (result, c) => {
-      if (!result.success) {
-        return c.json(
-          {
-            error: {
-              code: "VALIDATION_ERROR",
-              message: "Validation failed",
-              details: result.error.errors.map((error) => ({
-                field: error.path.join("."),
-                message: error.message,
-              })),
-            },
-          },
-          400,
-        );
-      }
-    }),
+    zValidator("param", idParamSchema),
     async (c) => {
       const { id } = c.req.valid("param");
       const result = await userService.getUserById(id);
@@ -175,40 +127,8 @@ const setupUserRoutes = (app: Hono) => {
         },
       },
     }),
-    zValidator("param", idParamSchema, (result, c) => {
-      if (!result.success) {
-        return c.json(
-          {
-            error: {
-              code: "VALIDATION_ERROR",
-              message: "Validation failed",
-              details: result.error.errors.map((error) => ({
-                field: error.path.join("."),
-                message: error.message,
-              })),
-            },
-          },
-          400,
-        );
-      }
-    }),
-    zValidator("json", updateUserRequestSchema, (result, c) => {
-      if (!result.success) {
-        return c.json(
-          {
-            error: {
-              code: "VALIDATION_ERROR",
-              message: "Validation failed",
-              details: result.error.errors.map((error) => ({
-                field: error.path.join("."),
-                message: error.message,
-              })),
-            },
-          },
-          400,
-        );
-      }
-    }),
+    zValidator("param", idParamSchema),
+    zValidator("json", updateUserRequestSchema),
     async (c) => {
       const { id } = c.req.valid("param");
       const userData = c.req.valid("json");
@@ -241,23 +161,7 @@ const setupUserRoutes = (app: Hono) => {
         },
       },
     }),
-    zValidator("param", idParamSchema, (result, c) => {
-      if (!result.success) {
-        return c.json(
-          {
-            error: {
-              code: "VALIDATION_ERROR",
-              message: "Validation failed",
-              details: result.error.errors.map((error) => ({
-                field: error.path.join("."),
-                message: error.message,
-              })),
-            },
-          },
-          400,
-        );
-      }
-    }),
+    zValidator("param", idParamSchema),
     async (c) => {
       const { id } = c.req.valid("param");
       const result = await userService.deleteUser(id);
@@ -280,4 +184,4 @@ const setupUserRoutes = (app: Hono) => {
   );
 };
 
-export { setupUserRoutes, userRoutes as userRoutesTyped };
+export { setupUserRoutes };
