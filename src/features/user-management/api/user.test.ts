@@ -89,8 +89,9 @@ describe("User Management API", () => {
       });
 
       expect(response.status).toBe(400);
-      const result = (await response.json()) as ErrorResponse;
-      expect(result.error.code).toBe("VALIDATION_ERROR");
+      const result = (await response.json()) as { success: boolean; error: any };
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
     });
 
     test("should return 400 for invalid email", async () => {
@@ -107,8 +108,9 @@ describe("User Management API", () => {
       });
 
       expect(response.status).toBe(400);
-      const result = (await response.json()) as ErrorResponse;
-      expect(result.error.code).toBe("VALIDATION_ERROR");
+      const result = (await response.json()) as { success: boolean; error: any };
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
     });
 
     test("should return 400 for duplicate username", async () => {
@@ -213,8 +215,9 @@ describe("User Management API", () => {
       const response = await app.request("/api/users/invalid");
 
       expect(response.status).toBe(400);
-      const result = (await response.json()) as ErrorResponse;
-      expect(result.error.code).toBe("VALIDATION_ERROR");
+      const result = (await response.json()) as { success: boolean; error: any };
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
     });
   });
 

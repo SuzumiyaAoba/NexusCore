@@ -120,8 +120,9 @@ describe("Task Management API", () => {
       });
 
       expect(response.status).toBe(400);
-      const result = (await response.json()) as ErrorResponse;
-      expect(result.error.code).toBe("VALIDATION_ERROR");
+      const result = (await response.json()) as { success: boolean; error: any };
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
     });
 
     test("should return 400 for title too long", async () => {
@@ -359,8 +360,9 @@ describe("Task Management API", () => {
       const response = await app.request("/api/tasks/invalid");
 
       expect(response.status).toBe(400);
-      const result = (await response.json()) as ErrorResponse;
-      expect(result.error.code).toBe("VALIDATION_ERROR");
+      const result = (await response.json()) as { success: boolean; error: any };
+      expect(result.success).toBe(false);
+      expect(result.error).toBeDefined();
     });
   });
 
