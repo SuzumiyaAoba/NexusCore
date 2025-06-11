@@ -75,14 +75,8 @@ export const taskQuerySchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
-export const paginationQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).default(20),
-  offset: z.coerce.number().int().min(0).default(0),
-});
-
 export type CreateTaskRequest = z.infer<typeof createTaskRequestSchema>;
 export type UpdateTaskRequest = z.infer<typeof updateTaskRequestSchema>;
 export type CreateUserRequest = z.infer<typeof createUserRequestSchema>;
 export type UpdateUserRequest = z.infer<typeof updateUserRequestSchema>;
 export type TaskQuery = z.infer<typeof taskQuerySchema>;
-export type PaginationQuery = z.infer<typeof paginationQuerySchema>;

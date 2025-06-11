@@ -28,10 +28,8 @@
     "hono": "^4.7.4",
     "hono-openapi": "^0.4.8",
     "neverthrow": "^8.2.0",
-    "reflect-metadata": "^0.2.2",
     "sqlite3": "^5.1.7",
     "tslog": "^4.9.3",
-    "tsyringe": "^4.10.0",
     "uuid": "^11.1.0",
     "zod": "^3.25.56",
     "zod-openapi": "^4.2.4"
