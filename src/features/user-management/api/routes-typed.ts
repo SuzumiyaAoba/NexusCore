@@ -1,9 +1,9 @@
 import { UserRepository } from "@/entities/user/api/repository";
-import { RouteBuilder } from "@/shared/lib/api/route-builder";
+import { handleResultError } from "@/shared/lib/api/error-helpers";
 import { idParamSchema } from "@/shared/lib/validation/params";
 import { paginationQuerySchema } from "@/shared/lib/validation/query";
 import { createUserRequestSchema, updateUserRequestSchema } from "@/shared/lib/validation/request";
-import { Hono } from "hono";
+import type { Hono } from "hono";
 import { describeRoute } from "hono-openapi";
 import { resolver, validator as zValidator } from "hono-openapi/zod";
 import { paginatedUserResponseSchema } from "./schemas";
@@ -11,9 +11,6 @@ import { UserService } from "./service";
 
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
-
-const userRoutes = new Hono();
-const routes = new RouteBuilder(userRoutes);
 
 const setupUserRoutes = (app: Hono) => {
   app.post(
@@ -32,16 +29,7 @@ const setupUserRoutes = (app: Hono) => {
       const result = await userService.createUser(userData);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data, 201);
@@ -69,16 +57,7 @@ const setupUserRoutes = (app: Hono) => {
       const result = await userService.getUsers(query);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data);
@@ -101,16 +80,7 @@ const setupUserRoutes = (app: Hono) => {
       const result = await userService.getUserById(id);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data);
@@ -135,16 +105,7 @@ const setupUserRoutes = (app: Hono) => {
       const result = await userService.updateUser(id, userData);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data);
@@ -167,16 +128,7 @@ const setupUserRoutes = (app: Hono) => {
       const result = await userService.deleteUser(id);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return new Response(null, { status: 204 });

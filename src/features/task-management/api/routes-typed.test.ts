@@ -38,10 +38,11 @@ describe("Task Management API Integration Tests", () => {
 
       const res = await app.request(req);
       expect(res.status).toBe(400);
-      // zValidator returns ZodError format directly
-      const data = (await res.json()) as { success: boolean; error: any };
+      // hono-openapi/zod validator returns ZodError format directly
+      const data = (await res.json()) as { success: boolean; error: { issues: Array<any>; name: string } };
       expect(data.success).toBe(false);
-      expect(data.error).toBeDefined();
+      expect(data.error.name).toBe("ZodError");
+      expect(data.error.issues).toBeDefined();
     });
 
     test("should return 400 for invalid task ID parameter", async () => {
@@ -80,11 +81,12 @@ describe("Task Management API Integration Tests", () => {
     test("should return 400 for invalid query parameters", async () => {
       const req = new Request("http://localhost/api/tasks?limit=invalid");
       const res = await app.request(req);
-      const data = (await res.json()) as { success: boolean; error: any };
+      const data = (await res.json()) as { success: boolean; error: { issues: Array<any>; name: string } };
 
       expect(res.status).toBe(400);
       expect(data.success).toBe(false);
-      expect(data.error).toBeDefined();
+      expect(data.error.name).toBe("ZodError");
+      expect(data.error.issues).toBeDefined();
     });
 
     test("should return 400 for invalid bulk update data", async () => {
@@ -98,11 +100,12 @@ describe("Task Management API Integration Tests", () => {
       });
 
       const res = await app.request(req);
-      const data = (await res.json()) as { success: boolean; error: any };
+      const data = (await res.json()) as { success: boolean; error: { issues: Array<any>; name: string } };
 
       expect(res.status).toBe(400);
       expect(data.success).toBe(false);
-      expect(data.error).toBeDefined();
+      expect(data.error.name).toBe("ZodError");
+      expect(data.error.issues).toBeDefined();
     });
   });
 

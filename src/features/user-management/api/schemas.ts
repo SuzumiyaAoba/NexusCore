@@ -5,9 +5,9 @@ export const userResponseSchema = z.object({
   id: z.number(),
   username: z.string(),
   displayName: z.string(),
-  email: z.string(),
+  email: z.string().email(),
   avatarUrl: z.string().nullable(),
-  createdAt: z.string(),
+  createdAt: z.string().datetime(),
 });
 
 // Paginated user response schema

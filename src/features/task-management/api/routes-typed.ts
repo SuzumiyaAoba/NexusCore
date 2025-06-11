@@ -1,8 +1,9 @@
 import { TaskRepository } from "@/entities/task/api/repository";
+import { handleResultError } from "@/shared/lib/api/error-helpers";
 import { idParamSchema } from "@/shared/lib/validation/params";
 import { paginationQuerySchema } from "@/shared/lib/validation/query";
 import { createTaskRequestSchema, taskQuerySchema, updateTaskRequestSchema } from "@/shared/lib/validation/request";
-import { Hono } from "hono";
+import type { Hono } from "hono";
 import { describeRoute } from "hono-openapi";
 import { validator as zValidator } from "hono-openapi/zod";
 import { z } from "zod";
@@ -10,8 +11,6 @@ import { TaskService } from "./service";
 
 const taskRepository = new TaskRepository();
 const taskService = new TaskService(taskRepository);
-
-const taskRoutes = new Hono();
 
 const setupTaskRoutes = (app: Hono) => {
   app.post(
@@ -34,16 +33,7 @@ const setupTaskRoutes = (app: Hono) => {
       const result = await taskService.createTask(taskData, createdBy);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data, 201);
@@ -66,16 +56,7 @@ const setupTaskRoutes = (app: Hono) => {
       const result = await taskService.getTasks(query);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data);
@@ -98,16 +79,7 @@ const setupTaskRoutes = (app: Hono) => {
       const result = await taskService.getDeletedTasks(query);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data);
@@ -130,16 +102,7 @@ const setupTaskRoutes = (app: Hono) => {
       const result = await taskService.getTaskById(id);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data);
@@ -164,16 +127,7 @@ const setupTaskRoutes = (app: Hono) => {
       const result = await taskService.updateTask(id, taskData);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data);
@@ -196,16 +150,7 @@ const setupTaskRoutes = (app: Hono) => {
       const result = await taskService.deleteTask(id);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return new Response(null, { status: 204 });
@@ -229,16 +174,7 @@ const setupTaskRoutes = (app: Hono) => {
       const result = await taskService.restoreTask(id);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return c.json(result.data);
@@ -261,16 +197,7 @@ const setupTaskRoutes = (app: Hono) => {
       const result = await taskService.permanentDeleteTask(id);
 
       if (!result.success) {
-        const statusCode = result.error.statusCode || 500;
-        return c.json(
-          {
-            error: {
-              code: result.error.code,
-              message: result.error.message,
-            },
-          },
-          statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-        );
+        return handleResultError(c, result);
       }
 
       return new Response(null, { status: 204 });
