@@ -68,9 +68,9 @@ describe("TaskService", () => {
 
       const result = await service.createTask(taskData, 1);
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toEqual(mockTask);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value).toEqual(mockTask);
       }
       expect(mockRepo.create as any).toHaveBeenCalledTimes(1);
       const callArgs = (mockRepo.create as any).mock.calls[0][0];
@@ -92,8 +92,8 @@ describe("TaskService", () => {
 
       const result = await service.createTask(invalidData as CreateTaskRequest, 1);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
       }
       expect(mockRepo.create as any).not.toHaveBeenCalled();
@@ -110,8 +110,8 @@ describe("TaskService", () => {
 
       const result = await service.createTask(taskData, 1);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("DATABASE_ERROR");
         expect(result.error.message).toBe("Failed to create task");
       }
@@ -140,9 +140,9 @@ describe("TaskService", () => {
       const service = new TaskService(mockRepo);
       const result = await service.getTaskById(1);
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toEqual(mockTask);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value).toEqual(mockTask);
       }
     });
 
@@ -153,8 +153,8 @@ describe("TaskService", () => {
       const service = new TaskService(mockRepo);
       const result = await service.getTaskById(999);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("NOT_FOUND");
       }
     });
@@ -166,8 +166,8 @@ describe("TaskService", () => {
       const service = new TaskService(mockRepo);
       const result = await service.getTaskById(1);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("DATABASE_ERROR");
       }
     });
@@ -202,9 +202,9 @@ describe("TaskService", () => {
 
       const result = await service.updateTask(1, updateData);
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toEqual(updatedTask);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value).toEqual(updatedTask);
       }
     });
 
@@ -224,8 +224,8 @@ describe("TaskService", () => {
 
       const result = await service.updateTask(1, updateData);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toContain("Cannot change status from DONE");
       }
@@ -248,8 +248,8 @@ describe("TaskService", () => {
 
       const result = await service.updateTask(1, updateData);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toContain("Cannot change priority of completed tasks");
       }
@@ -267,9 +267,9 @@ describe("TaskService", () => {
       const service = new TaskService(mockRepo);
       const result = await service.deleteTask(1);
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe(true);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value).toBe(true);
       }
     });
 
@@ -280,8 +280,8 @@ describe("TaskService", () => {
       const service = new TaskService(mockRepo);
       const result = await service.deleteTask(999);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("NOT_FOUND");
       }
     });
@@ -299,11 +299,11 @@ describe("TaskService", () => {
       const service = new TaskService(mockRepo);
       const result = await service.bulkUpdateTasks([1, 2], { status: "DOING" });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.updated).toBe(2);
-        expect(result.data.failed).toBe(0);
-        expect(result.data.errors).toEqual([]);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.updated).toBe(2);
+        expect(result.value.failed).toBe(0);
+        expect(result.value.errors).toEqual([]);
       }
     });
 
@@ -318,11 +318,11 @@ describe("TaskService", () => {
       const service = new TaskService(mockRepo);
       const result = await service.bulkUpdateTasks([1, 999], { status: "DOING" });
 
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.updated).toBe(1);
-        expect(result.data.failed).toBe(1);
-        expect(result.data.errors).toHaveLength(1);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.updated).toBe(1);
+        expect(result.value.failed).toBe(1);
+        expect(result.value.errors).toHaveLength(1);
       }
     });
   });

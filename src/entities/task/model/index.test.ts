@@ -15,11 +15,11 @@ describe("TaskDomain", () => {
       };
 
       const result = TaskDomain.validateCreate(taskData);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.title).toBe("Test Task");
-        expect(result.data.status).toBe("TODO");
-        expect(result.data.priority).toBe("medium");
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.title).toBe("Test Task");
+        expect(result.value.status).toBe("TODO");
+        expect(result.value.priority).toBe("medium");
       }
     });
 
@@ -29,13 +29,13 @@ describe("TaskDomain", () => {
       };
 
       const result = TaskDomain.validateCreate(taskData);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.title).toBe("Minimal Task");
-        expect(result.data.status).toBe("TODO");
-        expect(result.data.priority).toBe("medium");
-        expect(result.data.importance).toBe(false);
-        expect(result.data.urgency).toBe(false);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.title).toBe("Minimal Task");
+        expect(result.value.status).toBe("TODO");
+        expect(result.value.priority).toBe("medium");
+        expect(result.value.importance).toBe(false);
+        expect(result.value.urgency).toBe(false);
       }
     });
 
@@ -45,8 +45,8 @@ describe("TaskDomain", () => {
       };
 
       const result = TaskDomain.validateCreate(taskData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toContain("String must contain at least 1 character(s)");
       }
@@ -58,8 +58,8 @@ describe("TaskDomain", () => {
       };
 
       const result = TaskDomain.validateCreate(taskData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toContain("String must contain at most 100 character(s)");
       }
@@ -73,8 +73,8 @@ describe("TaskDomain", () => {
       };
 
       const result = TaskDomain.validateCreate(taskData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.message).toContain("Scheduled end date must be after start date");
       }
     });
@@ -89,11 +89,11 @@ describe("TaskDomain", () => {
       };
 
       const result = TaskDomain.validateUpdate(updateData);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.title).toBe("Updated Task");
-        expect(result.data.status).toBe("DOING");
-        expect(result.data.priority).toBe("high");
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.title).toBe("Updated Task");
+        expect(result.value.status).toBe("DOING");
+        expect(result.value.priority).toBe("high");
       }
     });
 
@@ -101,7 +101,7 @@ describe("TaskDomain", () => {
       const updateData = {};
 
       const result = TaskDomain.validateUpdate(updateData);
-      expect(result.success).toBe(true);
+      expect(result.isOk()).toBe(true);
     });
 
     test("should validate nullable fields", () => {
@@ -112,11 +112,11 @@ describe("TaskDomain", () => {
       };
 
       const result = TaskDomain.validateUpdate(updateData);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.projectId).toBe(null);
-        expect(result.data.categoryId).toBe(null);
-        expect(result.data.estimatedTime).toBe(null);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.projectId).toBe(null);
+        expect(result.value.categoryId).toBe(null);
+        expect(result.value.estimatedTime).toBe(null);
       }
     });
   });
@@ -124,33 +124,33 @@ describe("TaskDomain", () => {
   describe("validateId", () => {
     test("should validate positive integer", () => {
       const result = TaskDomain.validateId(123);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe(123);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value).toBe(123);
       }
     });
 
     test("should coerce string numbers", () => {
       const result = TaskDomain.validateId("123");
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe(123);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value).toBe(123);
       }
     });
 
     test("should fail for zero", () => {
       const result = TaskDomain.validateId(0);
-      expect(result.success).toBe(false);
+      expect(result.isErr()).toBe(true);
     });
 
     test("should fail for negative numbers", () => {
       const result = TaskDomain.validateId(-1);
-      expect(result.success).toBe(false);
+      expect(result.isErr()).toBe(true);
     });
 
     test("should fail for non-numeric strings", () => {
       const result = TaskDomain.validateId("abc");
-      expect(result.success).toBe(false);
+      expect(result.isErr()).toBe(true);
     });
   });
 

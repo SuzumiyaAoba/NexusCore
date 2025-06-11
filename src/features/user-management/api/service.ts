@@ -1,7 +1,7 @@
+import { type Result, err, ok } from "neverthrow";
 import type { UserRepository } from "../../../entities/user/api/repository";
 import { UserDomain } from "../../../entities/user/model";
 import { type AppError, ErrorFactory } from "../../../shared/lib/errors/enhanced";
-import { type Result, failure, success } from "../../../shared/lib/types/result";
 import type { CreateUserRequest, PaginatedResponse, UpdateUserRequest, User } from "../../../shared/types";
 
 export class UserService {
@@ -11,26 +11,26 @@ export class UserService {
     try {
       // Validate input
       const validationResult = UserDomain.validateCreate(userData);
-      if (!validationResult.success) {
-        return failure(validationResult.error);
+      if (validationResult.isErr()) {
+        return err(validationResult.error);
       }
 
       // Check for existing username
-      const existingUser = await this.userRepository.findByUsername(validationResult.data.username);
+      const existingUser = await this.userRepository.findByUsername(validationResult.value.username);
       if (existingUser) {
-        return failure(ErrorFactory.validation("Username already exists", "username"));
+        return err(ErrorFactory.validation("Username already exists", "username"));
       }
 
       // Check for existing email
-      const existingEmail = await this.userRepository.findByEmail(validationResult.data.email);
+      const existingEmail = await this.userRepository.findByEmail(validationResult.value.email);
       if (existingEmail) {
-        return failure(ErrorFactory.validation("Email already exists", "email"));
+        return err(ErrorFactory.validation("Email already exists", "email"));
       }
 
-      const user = await this.userRepository.create(validationResult.data);
-      return success(user);
+      const user = await this.userRepository.create(validationResult.value);
+      return ok(user);
     } catch (error) {
-      return failure(ErrorFactory.database("Failed to create user", error instanceof Error ? error : undefined));
+      return err(ErrorFactory.database("Failed to create user", error instanceof Error ? error : undefined));
     }
   }
 
@@ -39,12 +39,12 @@ export class UserService {
       const user = await this.userRepository.findById(id);
 
       if (!user) {
-        return failure(ErrorFactory.notFound("User", id));
+        return err(ErrorFactory.notFound("User", id));
       }
 
-      return success(user);
+      return ok(user);
     } catch (error) {
-      return failure(ErrorFactory.database("Failed to retrieve user", error instanceof Error ? error : undefined));
+      return err(ErrorFactory.database("Failed to retrieve user", error instanceof Error ? error : undefined));
     }
   }
 
@@ -53,9 +53,9 @@ export class UserService {
   ): Promise<Result<PaginatedResponse<User>, AppError>> {
     try {
       const result = await this.userRepository.findAll(options);
-      return success(result);
+      return ok(result);
     } catch (error) {
-      return failure(ErrorFactory.database("Failed to retrieve users", error instanceof Error ? error : undefined));
+      return err(ErrorFactory.database("Failed to retrieve users", error instanceof Error ? error : undefined));
     }
   }
 
@@ -63,34 +63,34 @@ export class UserService {
     try {
       // Validate input
       const validationResult = UserDomain.validateUpdate(userData);
-      if (!validationResult.success) {
-        return failure(validationResult.error);
+      if (validationResult.isErr()) {
+        return err(validationResult.error);
       }
 
       // Check if user exists
       const existingUser = await this.userRepository.findById(id);
       if (!existingUser) {
-        return failure(ErrorFactory.notFound("User", id));
+        return err(ErrorFactory.notFound("User", id));
       }
 
-      const validatedData = validationResult.data;
+      const validatedData = validationResult.value;
 
       // Check for email conflict if email is being updated
       if (validatedData.email && validatedData.email !== existingUser.email) {
         const existingEmail = await this.userRepository.findByEmail(validatedData.email);
         if (existingEmail) {
-          return failure(ErrorFactory.validation("Email already exists", "email"));
+          return err(ErrorFactory.validation("Email already exists", "email"));
         }
       }
 
       const updatedUser = await this.userRepository.update(id, validatedData);
       if (!updatedUser) {
-        return failure(ErrorFactory.notFound("User", id));
+        return err(ErrorFactory.notFound("User", id));
       }
 
-      return success(updatedUser);
+      return ok(updatedUser);
     } catch (error) {
-      return failure(ErrorFactory.database("Failed to update user", error instanceof Error ? error : undefined));
+      return err(ErrorFactory.database("Failed to update user", error instanceof Error ? error : undefined));
     }
   }
 
@@ -99,13 +99,13 @@ export class UserService {
       // Check if user exists
       const existingUser = await this.userRepository.findById(id);
       if (!existingUser) {
-        return failure(ErrorFactory.notFound("User", id));
+        return err(ErrorFactory.notFound("User", id));
       }
 
       const result = await this.userRepository.delete(id);
-      return success(result);
+      return ok(result);
     } catch (error) {
-      return failure(ErrorFactory.database("Failed to delete user", error instanceof Error ? error : undefined));
+      return err(ErrorFactory.database("Failed to delete user", error instanceof Error ? error : undefined));
     }
   }
 }

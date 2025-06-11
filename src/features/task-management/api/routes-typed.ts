@@ -32,11 +32,11 @@ const setupTaskRoutes = (app: Hono) => {
       const createdBy = userIdHeader ? Number.parseInt(userIdHeader) : 1;
       const result = await taskService.createTask(taskData, createdBy);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data, 201);
+      return c.json(result.value, 201);
     },
   );
 
@@ -55,11 +55,11 @@ const setupTaskRoutes = (app: Hono) => {
       const query = c.req.valid("query");
       const result = await taskService.getTasks(query);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data);
+      return c.json(result.value);
     },
   );
 
@@ -78,11 +78,11 @@ const setupTaskRoutes = (app: Hono) => {
       const query = c.req.valid("query");
       const result = await taskService.getDeletedTasks(query);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data);
+      return c.json(result.value);
     },
   );
 
@@ -101,11 +101,11 @@ const setupTaskRoutes = (app: Hono) => {
       const { id } = c.req.valid("param");
       const result = await taskService.getTaskById(id);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data);
+      return c.json(result.value);
     },
   );
 
@@ -126,11 +126,11 @@ const setupTaskRoutes = (app: Hono) => {
       const taskData = c.req.valid("json");
       const result = await taskService.updateTask(id, taskData);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data);
+      return c.json(result.value);
     },
   );
 
@@ -149,8 +149,8 @@ const setupTaskRoutes = (app: Hono) => {
       const { id } = c.req.valid("param");
       const result = await taskService.deleteTask(id);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
       return new Response(null, { status: 204 });
@@ -173,11 +173,11 @@ const setupTaskRoutes = (app: Hono) => {
       const { id } = c.req.valid("param");
       const result = await taskService.restoreTask(id);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data);
+      return c.json(result.value);
     },
   );
 
@@ -196,8 +196,8 @@ const setupTaskRoutes = (app: Hono) => {
       const { id } = c.req.valid("param");
       const result = await taskService.permanentDeleteTask(id);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
       return new Response(null, { status: 204 });

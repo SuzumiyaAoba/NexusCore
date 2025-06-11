@@ -28,11 +28,11 @@ const setupUserRoutes = (app: Hono) => {
       const userData = c.req.valid("json");
       const result = await userService.createUser(userData);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data, 201);
+      return c.json(result.value, 201);
     },
   );
 
@@ -56,11 +56,11 @@ const setupUserRoutes = (app: Hono) => {
       const query = c.req.valid("query");
       const result = await userService.getUsers(query);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data);
+      return c.json(result.value);
     },
   );
 
@@ -79,11 +79,11 @@ const setupUserRoutes = (app: Hono) => {
       const { id } = c.req.valid("param");
       const result = await userService.getUserById(id);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data);
+      return c.json(result.value);
     },
   );
 
@@ -104,11 +104,11 @@ const setupUserRoutes = (app: Hono) => {
       const userData = c.req.valid("json");
       const result = await userService.updateUser(id, userData);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
-      return c.json(result.data);
+      return c.json(result.value);
     },
   );
 
@@ -127,8 +127,8 @@ const setupUserRoutes = (app: Hono) => {
       const { id } = c.req.valid("param");
       const result = await userService.deleteUser(id);
 
-      if (!result.success) {
-        return handleResultError(c, result);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
       }
 
       return new Response(null, { status: 204 });

@@ -1,6 +1,6 @@
+import { type Result, err, ok } from "neverthrow";
 import { z } from "zod";
 import { type AppError, ErrorFactory } from "../../../shared/lib/errors/enhanced";
-import { type Result, failure, success } from "../../../shared/lib/types/result";
 import type {
   CreateTaskRequest,
   EisenhowerQuadrant,
@@ -85,38 +85,38 @@ export namespace TaskDomain {
   export function validateCreate(data: unknown): Result<CreateTaskRequest, AppError> {
     try {
       const validated = createTaskSchema.parse(data);
-      return success(validated);
+      return ok(validated);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const message = error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
-        return failure(ErrorFactory.validation(message, error.errors[0]?.path[0]?.toString()));
+        return err(ErrorFactory.validation(message, error.errors[0]?.path[0]?.toString()));
       }
-      return failure(ErrorFactory.validation("Invalid task data"));
+      return err(ErrorFactory.validation("Invalid task data"));
     }
   }
 
   export function validateUpdate(data: unknown): Result<UpdateTaskRequest, AppError> {
     try {
       const validated = updateTaskSchema.parse(data);
-      return success(validated);
+      return ok(validated);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const message = error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
-        return failure(ErrorFactory.validation(message, error.errors[0]?.path[0]?.toString()));
+        return err(ErrorFactory.validation(message, error.errors[0]?.path[0]?.toString()));
       }
-      return failure(ErrorFactory.validation("Invalid task update data"));
+      return err(ErrorFactory.validation("Invalid task update data"));
     }
   }
 
   export function validateId(id: unknown): Result<number, AppError> {
     try {
       const validated = taskIdSchema.parse(id);
-      return success(validated);
+      return ok(validated);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return failure(ErrorFactory.validation("Invalid task ID"));
+        return err(ErrorFactory.validation("Invalid task ID"));
       }
-      return failure(ErrorFactory.validation("Invalid task ID"));
+      return err(ErrorFactory.validation("Invalid task ID"));
     }
   }
 
