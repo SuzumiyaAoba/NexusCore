@@ -10,8 +10,8 @@ import type {
   UpdateTaskRequest,
 } from "../../../shared/types";
 import { BulkOperationService } from "./bulk-operation-service";
-import { TaskBusinessLogic } from "./task-business-logic";
-import { TaskValidationService } from "./task-validation-service";
+import * as TaskBusinessLogic from "./task-business-logic";
+import * as TaskValidationService from "./task-validation-service";
 
 export class TaskService {
   private readonly bulkOperationService: BulkOperationService;

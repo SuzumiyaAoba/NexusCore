@@ -1,22 +1,22 @@
 import type { CreateTaskRequest, Priority, Task, TaskStatus, UpdateTaskRequest } from "../../../shared/types";
 
 export * from "./validation-schemas";
-export { TaskValidation } from "./validation-service";
-export { TaskBusinessRules } from "./business-rules";
+export * from "./validation-service";
+export * from "./business-rules";
 
-import { TaskBusinessRules } from "./business-rules";
-import { TaskValidation } from "./validation-service";
+import * as BusinessRules from "./business-rules";
+import * as ValidationService from "./validation-service";
 
 export namespace TaskDomain {
-  export const validateCreate = TaskValidation.validateCreate;
-  export const validateUpdate = TaskValidation.validateUpdate;
-  export const validateId = TaskValidation.validateId;
-  export const calculateEisenhowerQuadrant = TaskBusinessRules.calculateEisenhowerQuadrant;
-  export const isOverdue = TaskBusinessRules.isOverdue;
-  export const canUpdateStatus = TaskBusinessRules.canUpdateStatus;
-  export const canUpdatePriority = TaskBusinessRules.canUpdatePriority;
-  export const isValidProgress = TaskBusinessRules.isValidProgress;
-  export const isValidDateRange = TaskBusinessRules.isValidDateRange;
+  export const validateCreate = ValidationService.validateCreate;
+  export const validateUpdate = ValidationService.validateUpdate;
+  export const validateId = ValidationService.validateId;
+  export const calculateEisenhowerQuadrant = BusinessRules.calculateEisenhowerQuadrant;
+  export const isOverdue = BusinessRules.isOverdue;
+  export const canUpdateStatus = BusinessRules.canUpdateStatus;
+  export const canUpdatePriority = BusinessRules.canUpdatePriority;
+  export const isValidProgress = BusinessRules.isValidProgress;
+  export const isValidDateRange = BusinessRules.isValidDateRange;
 }
 
 export type { Task, CreateTaskRequest, UpdateTaskRequest, TaskStatus, Priority };

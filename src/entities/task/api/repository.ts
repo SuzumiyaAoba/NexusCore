@@ -16,7 +16,7 @@ import type {
   TaskWithRelations,
   UpdateTaskRequest,
 } from "../../../shared/types";
-import { TaskMapper } from "./task-mapper";
+import * as TaskMapper from "./task-mapper";
 import { TaskQueryBuilder } from "./task-query-builder";
 import { TaskRelationLoader } from "./task-relation-loader";
 import { TaskUpdateBuilder } from "./task-update-builder";
