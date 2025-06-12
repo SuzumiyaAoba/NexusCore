@@ -12,25 +12,22 @@ import { TaskService } from "./service";
 const taskRepository = new TaskRepository();
 const taskService = new TaskService(taskRepository);
 
-const bulkIdsSchema = z.object({
-  ids: z.array(z.number().int().positive()).min(1),
-});
-
-const bulkUpdateSchema = z.object({
-  ids: z.array(z.number().int().positive()).min(1),
-  data: updateTaskRequestSchema,
-});
-
 const setupTaskRoutes = (app: Hono) => {
   app.post(
     "/api/tasks",
     describeRoute({
       description: "Create a new task",
-      responses: { 201: { description: "Task created successfully" } },
+      responses: {
+        201: {
+          description: "Task created successfully",
+        },
+      },
     }),
     zValidator("json", createTaskRequestSchema),
     async (c) => {
       const taskData = c.req.valid("json");
+      // TODO: Get createdBy from authenticated user context
+      // For now, get from header for testing or use default
       const userIdHeader = c.req.header("x-user-id");
       const createdBy = userIdHeader ? Number.parseInt(userIdHeader) : 1;
       const result = await taskService.createTask(taskData, createdBy);
@@ -47,7 +44,11 @@ const setupTaskRoutes = (app: Hono) => {
     "/api/tasks",
     describeRoute({
       description: "Get all tasks",
-      responses: { 200: { description: "Tasks fetched successfully" } },
+      responses: {
+        200: {
+          description: "Tasks fetched successfully",
+        },
+      },
     }),
     zValidator("query", taskQuerySchema),
     async (c) => {
@@ -66,7 +67,11 @@ const setupTaskRoutes = (app: Hono) => {
     "/api/tasks/deleted",
     describeRoute({
       description: "Get deleted tasks",
-      responses: { 200: { description: "Deleted tasks fetched successfully" } },
+      responses: {
+        200: {
+          description: "Deleted tasks fetched successfully",
+        },
+      },
     }),
     zValidator("query", paginationQuerySchema),
     async (c) => {
@@ -85,7 +90,11 @@ const setupTaskRoutes = (app: Hono) => {
     "/api/tasks/:id",
     describeRoute({
       description: "Get task by ID",
-      responses: { 200: { description: "Task fetched successfully" } },
+      responses: {
+        200: {
+          description: "Task fetched successfully",
+        },
+      },
     }),
     zValidator("param", idParamSchema),
     async (c) => {
@@ -104,7 +113,11 @@ const setupTaskRoutes = (app: Hono) => {
     "/api/tasks/:id",
     describeRoute({
       description: "Update task",
-      responses: { 200: { description: "Task updated successfully" } },
+      responses: {
+        200: {
+          description: "Task updated successfully",
+        },
+      },
     }),
     zValidator("param", idParamSchema),
     zValidator("json", updateTaskRequestSchema),
@@ -125,7 +138,11 @@ const setupTaskRoutes = (app: Hono) => {
     "/api/tasks/:id",
     describeRoute({
       description: "Delete task",
-      responses: { 204: { description: "Task deleted successfully" } },
+      responses: {
+        204: {
+          description: "Task deleted successfully",
+        },
+      },
     }),
     zValidator("param", idParamSchema),
     async (c) => {
@@ -140,13 +157,18 @@ const setupTaskRoutes = (app: Hono) => {
     },
   );
 
-  app.post(
+  app.put(
     "/api/tasks/:id/restore",
     describeRoute({
       description: "Restore deleted task",
-      responses: { 200: { description: "Task restored successfully" } },
+      responses: {
+        200: {
+          description: "Task restored successfully",
+        },
+      },
     }),
     zValidator("param", idParamSchema),
+    zValidator("json", z.object({})),
     async (c) => {
       const { id } = c.req.valid("param");
       const result = await taskService.restoreTask(id);
@@ -163,7 +185,11 @@ const setupTaskRoutes = (app: Hono) => {
     "/api/tasks/:id/permanent",
     describeRoute({
       description: "Permanently delete task",
-      responses: { 204: { description: "Task permanently deleted" } },
+      responses: {
+        204: {
+          description: "Task permanently deleted successfully",
+        },
+      },
     }),
     zValidator("param", idParamSchema),
     async (c) => {
@@ -175,44 +201,6 @@ const setupTaskRoutes = (app: Hono) => {
       }
 
       return new Response(null, { status: 204 });
-    },
-  );
-
-  app.put(
-    "/api/tasks/bulk/update",
-    describeRoute({
-      description: "Bulk update tasks",
-      responses: { 200: { description: "Tasks updated successfully" } },
-    }),
-    zValidator("json", bulkUpdateSchema),
-    async (c) => {
-      const { ids, data } = c.req.valid("json");
-      const result = await taskService.bulkUpdateTasks(ids, data);
-
-      if (result.isErr()) {
-        return handleResultError(c, result.error);
-      }
-
-      return c.json(result.value);
-    },
-  );
-
-  app.delete(
-    "/api/tasks/bulk/delete",
-    describeRoute({
-      description: "Bulk delete tasks",
-      responses: { 200: { description: "Tasks deleted successfully" } },
-    }),
-    zValidator("json", bulkIdsSchema),
-    async (c) => {
-      const { ids } = c.req.valid("json");
-      const result = await taskService.bulkDeleteTasks(ids);
-
-      if (result.isErr()) {
-        return handleResultError(c, result.error);
-      }
-
-      return c.json(result.value);
     },
   );
 };
