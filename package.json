@@ -19,20 +19,20 @@
   },
   "dependencies": {
     "@databases/sqlite": "^4.0.2",
-    "@hono/swagger-ui": "^0.5.1",
-    "@hono/zod-openapi": "^0.19.6",
     "@hono/zod-validator": "^0.5.0",
     "@libsql/client": "^0.15.5",
+    "@scalar/hono-api-reference": "^0.9.3",
     "@types/uuid": "^10.0.0",
     "drizzle-kit": "^0.31.1",
     "drizzle-orm": "^0.43.1",
     "hono": "^4.7.4",
-    "reflect-metadata": "^0.2.2",
+    "hono-openapi": "^0.4.8",
+    "neverthrow": "^8.2.0",
     "sqlite3": "^5.1.7",
     "tslog": "^4.9.3",
-    "tsyringe": "^4.10.0",
     "uuid": "^11.1.0",
-    "zod": "^3.24.4"
+    "zod": "^3.25.56",
+    "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

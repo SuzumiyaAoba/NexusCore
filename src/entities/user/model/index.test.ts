@@ -13,12 +13,12 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateCreate(userData);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.username).toBe("testuser");
-        expect(result.data.displayName).toBe("Test User");
-        expect(result.data.email).toBe("test@example.com");
-        expect(result.data.avatarUrl).toBe("https://example.com/avatar.jpg");
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.username).toBe("testuser");
+        expect(result.value.displayName).toBe("Test User");
+        expect(result.value.email).toBe("test@example.com");
+        expect(result.value.avatarUrl).toBe("https://example.com/avatar.jpg");
       }
     });
 
@@ -30,12 +30,12 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateCreate(userData);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.username).toBe("testuser");
-        expect(result.data.displayName).toBe("Test User");
-        expect(result.data.email).toBe("test@example.com");
-        expect(result.data.avatarUrl).toBeUndefined();
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.username).toBe("testuser");
+        expect(result.value.displayName).toBe("Test User");
+        expect(result.value.email).toBe("test@example.com");
+        expect(result.value.avatarUrl).toBeUndefined();
       }
     });
 
@@ -47,8 +47,8 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateCreate(userData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toContain("String must contain at least 3 character(s)");
       }
@@ -62,8 +62,8 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateCreate(userData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toContain("String must contain at most 50 character(s)");
       }
@@ -77,8 +77,8 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateCreate(userData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toContain("Username must contain only letters, numbers, and underscores");
       }
@@ -92,8 +92,8 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateCreate(userData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
       }
     });
@@ -106,8 +106,8 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateCreate(userData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toContain("Invalid email");
       }
@@ -122,8 +122,8 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateCreate(userData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
         expect(result.error.message).toContain("Invalid url");
       }
@@ -139,11 +139,11 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateUpdate(updateData);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.displayName).toBe("Updated Name");
-        expect(result.data.email).toBe("updated@example.com");
-        expect(result.data.avatarUrl).toBe("https://example.com/new-avatar.jpg");
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.displayName).toBe("Updated Name");
+        expect(result.value.email).toBe("updated@example.com");
+        expect(result.value.avatarUrl).toBe("https://example.com/new-avatar.jpg");
       }
     });
 
@@ -151,7 +151,7 @@ describe("UserDomain", () => {
       const updateData = {};
 
       const result = UserDomain.validateUpdate(updateData);
-      expect(result.success).toBe(true);
+      expect(result.isOk()).toBe(true);
     });
 
     test("should validate partial update", () => {
@@ -160,11 +160,11 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateUpdate(updateData);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data.displayName).toBe("New Name");
-        expect(result.data.email).toBeUndefined();
-        expect(result.data.avatarUrl).toBeUndefined();
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value.displayName).toBe("New Name");
+        expect(result.value.email).toBeUndefined();
+        expect(result.value.avatarUrl).toBeUndefined();
       }
     });
 
@@ -174,8 +174,8 @@ describe("UserDomain", () => {
       };
 
       const result = UserDomain.validateUpdate(updateData);
-      expect(result.success).toBe(false);
-      if (!result.success) {
+      expect(result.isErr()).toBe(true);
+      if (result.isErr()) {
         expect(result.error.code).toBe("VALIDATION_ERROR");
       }
     });
@@ -184,33 +184,33 @@ describe("UserDomain", () => {
   describe("validateId", () => {
     test("should validate positive integer", () => {
       const result = UserDomain.validateId(123);
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe(123);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value).toBe(123);
       }
     });
 
     test("should coerce string numbers", () => {
       const result = UserDomain.validateId("123");
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect(result.data).toBe(123);
+      expect(result.isOk()).toBe(true);
+      if (result.isOk()) {
+        expect(result.value).toBe(123);
       }
     });
 
     test("should fail for zero", () => {
       const result = UserDomain.validateId(0);
-      expect(result.success).toBe(false);
+      expect(result.isErr()).toBe(true);
     });
 
     test("should fail for negative numbers", () => {
       const result = UserDomain.validateId(-1);
-      expect(result.success).toBe(false);
+      expect(result.isErr()).toBe(true);
     });
 
     test("should fail for non-numeric strings", () => {
       const result = UserDomain.validateId("abc");
-      expect(result.success).toBe(false);
+      expect(result.isErr()).toBe(true);
     });
   });
 

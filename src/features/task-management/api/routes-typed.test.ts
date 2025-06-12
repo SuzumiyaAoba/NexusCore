@@ -3,10 +3,10 @@ import { sql } from "drizzle-orm";
 import { Hono } from "hono";
 import { db } from "../../../shared/config/database";
 import { setupTestDatabase } from "../../../shared/config/test-setup";
-import { taskRoutesTyped as taskRoutes } from "./routes-typed";
+import { setupTaskRoutes } from "./routes-typed";
 
 const app = new Hono();
-app.route("/", taskRoutes);
+setupTaskRoutes(app);
 
 describe("Task Management API Integration Tests", () => {
   beforeAll(async () => {
@@ -37,21 +37,22 @@ describe("Task Management API Integration Tests", () => {
       });
 
       const res = await app.request(req);
-      const data = (await res.json()) as { error: { code: string; message: string } };
-
       expect(res.status).toBe(400);
-      expect(data.error).toBeDefined();
-      expect(data.error.code).toBe("VALIDATION_ERROR");
-      expect(data.error.message).toContain("Invalid request body");
+      // hono-openapi/zod validator returns ZodError format directly
+      const data = (await res.json()) as { success: boolean; error: { issues: Array<any>; name: string } };
+      expect(data.success).toBe(false);
+      expect(data.error.name).toBe("ZodError");
+      expect(data.error.issues).toBeDefined();
     });
 
     test("should return 400 for invalid task ID parameter", async () => {
       const req = new Request("http://localhost/api/tasks/invalid");
       const res = await app.request(req);
-      const data = (await res.json()) as { error: { code: string; message: string } };
+      const data = (await res.json()) as { success: boolean; error: any };
 
       expect(res.status).toBe(400);
-      expect(data.error.code).toBe("VALIDATION_ERROR");
+      expect(data.success).toBe(false);
+      expect(data.error).toBeDefined();
     });
 
     test("should return 400 for invalid JSON in request body", async () => {
@@ -65,7 +66,7 @@ describe("Task Management API Integration Tests", () => {
       expect(res.status).toBe(400);
     });
 
-    test("should accept requests without explicit content-type", async () => {
+    test("should require content-type for JSON requests", async () => {
       const req = new Request("http://localhost/api/tasks", {
         method: "POST",
         headers: { "x-user-id": "1" },
@@ -73,17 +74,19 @@ describe("Task Management API Integration Tests", () => {
       });
 
       const res = await app.request(req);
-      // The API accepts this, creates the task successfully (returns 201)
-      expect(res.status).toBe(201);
+      // The API requires explicit content-type (returns 400)
+      expect(res.status).toBe(400);
     });
 
     test("should return 400 for invalid query parameters", async () => {
       const req = new Request("http://localhost/api/tasks?limit=invalid");
       const res = await app.request(req);
-      const data = (await res.json()) as { error: { code: string; message: string } };
+      const data = (await res.json()) as { success: boolean; error: { issues: Array<any>; name: string } };
 
       expect(res.status).toBe(400);
-      expect(data.error.code).toBe("VALIDATION_ERROR");
+      expect(data.success).toBe(false);
+      expect(data.error.name).toBe("ZodError");
+      expect(data.error.issues).toBeDefined();
     });
 
     test("should return 400 for invalid bulk update data", async () => {
@@ -97,10 +100,12 @@ describe("Task Management API Integration Tests", () => {
       });
 
       const res = await app.request(req);
-      const data = (await res.json()) as { error: { code: string; message: string } };
+      const data = (await res.json()) as { success: boolean; error: { issues: Array<any>; name: string } };
 
       expect(res.status).toBe(400);
-      expect(data.error.code).toBe("VALIDATION_ERROR");
+      expect(data.success).toBe(false);
+      expect(data.error.name).toBe("ZodError");
+      expect(data.error.issues).toBeDefined();
     });
   });
 

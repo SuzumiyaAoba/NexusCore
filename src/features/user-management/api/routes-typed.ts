@@ -1,137 +1,139 @@
-import { Hono } from "hono";
-import { UserRepository } from "../../../entities/user/api/repository";
-import { RouteBuilder } from "../../../shared/lib/api/route-builder";
-import { idParamSchema } from "../../../shared/lib/validation/params";
-import { paginationQuerySchema } from "../../../shared/lib/validation/query";
-import { createUserRequestSchema, updateUserRequestSchema } from "../../../shared/lib/validation/request";
+import { UserRepository } from "@/entities/user/api/repository";
+import { handleResultError } from "@/shared/lib/api/error-helpers";
+import { idParamSchema } from "@/shared/lib/validation/params";
+import { paginationQuerySchema } from "@/shared/lib/validation/query";
+import { createUserRequestSchema, updateUserRequestSchema } from "@/shared/lib/validation/request";
+import type { Hono } from "hono";
+import { describeRoute } from "hono-openapi";
+import { resolver, validator as zValidator } from "hono-openapi/zod";
+import { paginatedUserResponseSchema } from "./schemas";
 import { UserService } from "./service";
 
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 
-const userRoutes = new Hono();
-const routes = new RouteBuilder(userRoutes);
+const setupUserRoutes = (app: Hono) => {
+  app.post(
+    "/api/users",
+    describeRoute({
+      description: "Create a new user",
+      responses: {
+        201: {
+          description: "User created successfully",
+        },
+      },
+    }),
+    zValidator("json", createUserRequestSchema),
+    async (c) => {
+      const userData = c.req.valid("json");
+      const result = await userService.createUser(userData);
 
-// Create user
-routes.post("/api/users", {
-  body: createUserRequestSchema,
-  handler: async (c) => {
-    const userData = c.get("validatedBody");
-    const result = await userService.createUser(userData);
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
+      return c.json(result.value, 201);
+    },
+  );
+
+  app.get(
+    "/api/users",
+    describeRoute({
+      description: "Get all users",
+      responses: {
+        200: {
+          description: "Users fetched successfully",
+          content: {
+            "application/json": {
+              schema: resolver(paginatedUserResponseSchema),
+            },
           },
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("query", paginationQuerySchema),
+    async (c) => {
+      const query = c.req.valid("query");
+      const result = await userService.getUsers(query);
 
-    return c.json(result.data, 201);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Get all users
-routes.get("/api/users", {
-  query: paginationQuerySchema,
-  handler: async (c) => {
-    const query = c.get("validatedQuery");
-    const result = await userService.getUsers(query);
+      return c.json(result.value);
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.get(
+    "/api/users/:id",
+    describeRoute({
+      description: "Get user by ID",
+      responses: {
+        200: {
+          description: "User fetched successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("param", idParamSchema),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const result = await userService.getUserById(id);
 
-    return c.json(result.data);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Get user by ID
-routes.get("/api/users/:id", {
-  params: idParamSchema,
-  handler: async (c) => {
-    const { id } = c.get("validatedParams");
-    const result = await userService.getUserById(id);
+      return c.json(result.value);
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.put(
+    "/api/users/:id",
+    describeRoute({
+      description: "Update user",
+      responses: {
+        200: {
+          description: "User updated successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("param", idParamSchema),
+    zValidator("json", updateUserRequestSchema),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const userData = c.req.valid("json");
+      const result = await userService.updateUser(id, userData);
 
-    return c.json(result.data);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Update user
-routes.put("/api/users/:id", {
-  params: idParamSchema,
-  body: updateUserRequestSchema,
-  handler: async (c) => {
-    const { id } = c.get("validatedParams");
-    const userData = c.get("validatedBody");
-    const result = await userService.updateUser(id, userData);
+      return c.json(result.value);
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.delete(
+    "/api/users/:id",
+    describeRoute({
+      description: "Delete user",
+      responses: {
+        204: {
+          description: "User deleted successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("param", idParamSchema),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const result = await userService.deleteUser(id);
 
-    return c.json(result.data);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Delete user
-routes.delete("/api/users/:id", {
-  params: idParamSchema,
-  handler: async (c) => {
-    const { id } = c.get("validatedParams");
-    const result = await userService.deleteUser(id);
+      return new Response(null, { status: 204 });
+    },
+  );
+};
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
-        },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
-
-    return new Response(null, { status: 204 });
-  },
-});
-
-export { userRoutes as userRoutesTyped };
+export { setupUserRoutes };

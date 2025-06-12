@@ -1,219 +1,208 @@
-import { Hono } from "hono";
+import { TaskRepository } from "@/entities/task/api/repository";
+import { handleResultError } from "@/shared/lib/api/error-helpers";
+import { idParamSchema } from "@/shared/lib/validation/params";
+import { paginationQuerySchema } from "@/shared/lib/validation/query";
+import { createTaskRequestSchema, taskQuerySchema, updateTaskRequestSchema } from "@/shared/lib/validation/request";
+import type { Hono } from "hono";
+import { describeRoute } from "hono-openapi";
+import { validator as zValidator } from "hono-openapi/zod";
 import { z } from "zod";
-import { TaskRepository } from "../../../entities/task/api/repository";
-import { RouteBuilder } from "../../../shared/lib/api/route-builder";
-import { idParamSchema } from "../../../shared/lib/validation/params";
-import { paginationQuerySchema } from "../../../shared/lib/validation/query";
-import {
-  createTaskRequestSchema,
-  taskQuerySchema,
-  updateTaskRequestSchema,
-} from "../../../shared/lib/validation/request";
 import { TaskService } from "./service";
 
 const taskRepository = new TaskRepository();
 const taskService = new TaskService(taskRepository);
 
-const taskRoutes = new Hono();
-const routes = new RouteBuilder(taskRoutes);
-
-// Create task
-routes.post("/api/tasks", {
-  body: createTaskRequestSchema,
-  handler: async (c) => {
-    const taskData = c.get("validatedBody");
-    // TODO: Get createdBy from authenticated user context
-    // For now, get from header for testing or use default
-    const userIdHeader = c.req.header("x-user-id");
-    const createdBy = userIdHeader ? Number.parseInt(userIdHeader) : 1;
-    const result = await taskService.createTask(taskData, createdBy);
-
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+const setupTaskRoutes = (app: Hono) => {
+  app.post(
+    "/api/tasks",
+    describeRoute({
+      description: "Create a new task",
+      responses: {
+        201: {
+          description: "Task created successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("json", createTaskRequestSchema),
+    async (c) => {
+      const taskData = c.req.valid("json");
+      // TODO: Get createdBy from authenticated user context
+      // For now, get from header for testing or use default
+      const userIdHeader = c.req.header("x-user-id");
+      const createdBy = userIdHeader ? Number.parseInt(userIdHeader) : 1;
+      const result = await taskService.createTask(taskData, createdBy);
 
-    return c.json(result.data, 201);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Get all tasks
-routes.get("/api/tasks", {
-  query: taskQuerySchema,
-  handler: async (c) => {
-    const query = c.get("validatedQuery");
-    const result = await taskService.getTasks(query);
+      return c.json(result.value, 201);
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.get(
+    "/api/tasks",
+    describeRoute({
+      description: "Get all tasks",
+      responses: {
+        200: {
+          description: "Tasks fetched successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("query", taskQuerySchema),
+    async (c) => {
+      const query = c.req.valid("query");
+      const result = await taskService.getTasks(query);
 
-    return c.json(result.data);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Get deleted tasks (must be before /api/tasks/:id)
-routes.get("/api/tasks/deleted", {
-  query: paginationQuerySchema,
-  handler: async (c) => {
-    const query = c.get("validatedQuery");
-    const result = await taskService.getDeletedTasks(query);
+      return c.json(result.value);
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.get(
+    "/api/tasks/deleted",
+    describeRoute({
+      description: "Get deleted tasks",
+      responses: {
+        200: {
+          description: "Deleted tasks fetched successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("query", paginationQuerySchema),
+    async (c) => {
+      const query = c.req.valid("query");
+      const result = await taskService.getDeletedTasks(query);
 
-    return c.json(result.data);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Get task by ID
-routes.get("/api/tasks/:id", {
-  params: idParamSchema,
-  handler: async (c) => {
-    const { id } = c.get("validatedParams");
-    const result = await taskService.getTaskById(id);
+      return c.json(result.value);
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.get(
+    "/api/tasks/:id",
+    describeRoute({
+      description: "Get task by ID",
+      responses: {
+        200: {
+          description: "Task fetched successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("param", idParamSchema),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const result = await taskService.getTaskById(id);
 
-    return c.json(result.data);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Update task
-routes.put("/api/tasks/:id", {
-  params: idParamSchema,
-  body: updateTaskRequestSchema,
-  handler: async (c) => {
-    const { id } = c.get("validatedParams");
-    const taskData = c.get("validatedBody");
-    const result = await taskService.updateTask(id, taskData);
+      return c.json(result.value);
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.put(
+    "/api/tasks/:id",
+    describeRoute({
+      description: "Update task",
+      responses: {
+        200: {
+          description: "Task updated successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("param", idParamSchema),
+    zValidator("json", updateTaskRequestSchema),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const taskData = c.req.valid("json");
+      const result = await taskService.updateTask(id, taskData);
 
-    return c.json(result.data);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Delete task
-routes.delete("/api/tasks/:id", {
-  params: idParamSchema,
-  handler: async (c) => {
-    const { id } = c.get("validatedParams");
-    const result = await taskService.deleteTask(id);
+      return c.json(result.value);
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.delete(
+    "/api/tasks/:id",
+    describeRoute({
+      description: "Delete task",
+      responses: {
+        204: {
+          description: "Task deleted successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("param", idParamSchema),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const result = await taskService.deleteTask(id);
 
-    return new Response(null, { status: 204 });
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Restore task
-routes.put("/api/tasks/:id/restore", {
-  params: idParamSchema,
-  body: z.object({}), // Empty body schema for PUT without body
-  handler: async (c) => {
-    const { id } = c.get("validatedParams");
-    const result = await taskService.restoreTask(id);
+      return new Response(null, { status: 204 });
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.put(
+    "/api/tasks/:id/restore",
+    describeRoute({
+      description: "Restore deleted task",
+      responses: {
+        200: {
+          description: "Task restored successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("param", idParamSchema),
+    zValidator("json", z.object({})),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const result = await taskService.restoreTask(id);
 
-    return c.json(result.data);
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-// Permanently delete task
-routes.delete("/api/tasks/:id/permanent", {
-  params: idParamSchema,
-  handler: async (c) => {
-    const { id } = c.get("validatedParams");
-    const result = await taskService.permanentDeleteTask(id);
+      return c.json(result.value);
+    },
+  );
 
-    if (!result.success) {
-      const statusCode = result.error.statusCode || 500;
-      return c.json(
-        {
-          error: {
-            code: result.error.code,
-            message: result.error.message,
-          },
+  app.delete(
+    "/api/tasks/:id/permanent",
+    describeRoute({
+      description: "Permanently delete task",
+      responses: {
+        204: {
+          description: "Task permanently deleted successfully",
         },
-        statusCode as 400 | 401 | 403 | 404 | 409 | 500,
-      );
-    }
+      },
+    }),
+    zValidator("param", idParamSchema),
+    async (c) => {
+      const { id } = c.req.valid("param");
+      const result = await taskService.permanentDeleteTask(id);
 
-    return new Response(null, { status: 204 });
-  },
-});
+      if (result.isErr()) {
+        return handleResultError(c, result.error);
+      }
 
-export { taskRoutes as taskRoutesTyped };
+      return new Response(null, { status: 204 });
+    },
+  );
+};
+
+export { setupTaskRoutes };

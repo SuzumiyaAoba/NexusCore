@@ -1,6 +1,6 @@
+import { type Result, err, ok } from "neverthrow";
 import { z } from "zod";
 import { type AppError, ErrorFactory } from "../../../shared/lib/errors/enhanced";
-import { type Result, failure, success } from "../../../shared/lib/types/result";
 import type { CreateUserRequest, UpdateUserRequest, User } from "../../../shared/types";
 
 // Validation schemas
@@ -28,38 +28,38 @@ export namespace UserDomain {
   export function validateCreate(data: unknown): Result<CreateUserRequest, AppError> {
     try {
       const validated = createUserSchema.parse(data);
-      return success(validated);
+      return ok(validated);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const message = error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
-        return failure(ErrorFactory.validation(message, error.errors[0]?.path[0]?.toString()));
+        return err(ErrorFactory.validation(message, error.errors[0]?.path[0]?.toString()));
       }
-      return failure(ErrorFactory.validation("Invalid user data"));
+      return err(ErrorFactory.validation("Invalid user data"));
     }
   }
 
   export function validateUpdate(data: unknown): Result<UpdateUserRequest, AppError> {
     try {
       const validated = updateUserSchema.parse(data);
-      return success(validated);
+      return ok(validated);
     } catch (error) {
       if (error instanceof z.ZodError) {
         const message = error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
-        return failure(ErrorFactory.validation(message, error.errors[0]?.path[0]?.toString()));
+        return err(ErrorFactory.validation(message, error.errors[0]?.path[0]?.toString()));
       }
-      return failure(ErrorFactory.validation("Invalid user update data"));
+      return err(ErrorFactory.validation("Invalid user update data"));
     }
   }
 
   export function validateId(id: unknown): Result<number, AppError> {
     try {
       const validated = userIdSchema.parse(id);
-      return success(validated);
+      return ok(validated);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return failure(ErrorFactory.validation("Invalid user ID"));
+        return err(ErrorFactory.validation("Invalid user ID"));
       }
-      return failure(ErrorFactory.validation("Invalid user ID"));
+      return err(ErrorFactory.validation("Invalid user ID"));
     }
   }
 
