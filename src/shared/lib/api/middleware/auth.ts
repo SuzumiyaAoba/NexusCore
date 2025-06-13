@@ -14,6 +14,8 @@ declare module "hono" {
 }
 
 export const authMiddleware = async (c: Context, next: Next) => {
+  // FIXME: Replace x-user-id header with proper authentication before production
+  // Reading user ID from headers is insecure and allows identity spoofing
   const userIdHeader = c.req.header("x-user-id");
   const userIdCookie = getCookie(c, "user_id");
 
@@ -31,7 +33,7 @@ export const authMiddleware = async (c: Context, next: Next) => {
     );
   }
 
-  const parsedUserId = Number.parseInt(userId);
+  const parsedUserId = Number.parseInt(userId, 10);
   if (Number.isNaN(parsedUserId) || parsedUserId <= 0) {
     return c.json(
       {
@@ -54,13 +56,14 @@ export const authMiddleware = async (c: Context, next: Next) => {
 };
 
 export const optionalAuthMiddleware = async (c: Context, next: Next) => {
+  // FIXME: Replace x-user-id header with proper authentication before production
   const userIdHeader = c.req.header("x-user-id");
   const userIdCookie = getCookie(c, "user_id");
 
   const userId = userIdHeader || userIdCookie;
 
   if (userId) {
-    const parsedUserId = Number.parseInt(userId);
+    const parsedUserId = Number.parseInt(userId, 10);
     if (!Number.isNaN(parsedUserId) && parsedUserId > 0) {
       c.set("user", {
         id: parsedUserId,
