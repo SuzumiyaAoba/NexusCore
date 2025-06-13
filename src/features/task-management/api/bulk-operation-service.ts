@@ -1,5 +1,5 @@
 import { type Result, ok } from "neverthrow";
-import type { AppError } from "../../../shared/lib/errors/enhanced";
+import { type AppError, ErrorFactory } from "../../../shared/lib/errors/enhanced";
 import type { UpdateTaskRequest } from "../../../shared/types";
 import type { TaskService } from "./service";
 
@@ -22,11 +22,27 @@ export class BulkOperationService {
 
     const successful = results.filter((r) => r.status === "fulfilled" && r.value.result.isOk()).length;
     const failed = results.length - successful;
-    const errors: AppError[] = results
-      .filter((r) => r.status === "fulfilled" && r.value.result.isErr())
-      .map((r) =>
-        (r as PromiseFulfilledResult<{ id: number; result: Result<any, AppError> }>).value.result._unsafeUnwrapErr(),
+
+    const errors: AppError[] = [];
+
+    // Collect errors from fulfilled but failed operations
+    for (const r of results.filter((r) => r.status === "fulfilled" && r.value.result.isErr())) {
+      const fulfilledResult = r as PromiseFulfilledResult<{ id: number; result: Result<any, AppError> }>;
+      if (fulfilledResult.value.result.isErr()) {
+        errors.push(fulfilledResult.value.result.error);
+      }
+    }
+
+    // Collect errors from rejected promises
+    for (const r of results.filter((r) => r.status === "rejected")) {
+      const rejectedResult = r as PromiseRejectedResult;
+      errors.push(
+        ErrorFactory.database(
+          "Operation failed",
+          rejectedResult.reason instanceof Error ? rejectedResult.reason : new Error(String(rejectedResult.reason)),
+        ),
       );
+    }
 
     return ok({
       successful,
@@ -47,13 +63,27 @@ export class BulkOperationService {
       (r) => r.status === "fulfilled" && r.value.result.isOk() && r.value.result.value,
     ).length;
     const failed = results.length - successful;
-    const errors: AppError[] = results
-      .filter((r) => r.status === "fulfilled" && r.value.result.isErr())
-      .map((r) =>
-        (
-          r as PromiseFulfilledResult<{ id: number; result: Result<boolean, AppError> }>
-        ).value.result._unsafeUnwrapErr(),
+
+    const errors: AppError[] = [];
+
+    // Collect errors from fulfilled but failed operations
+    for (const r of results.filter((r) => r.status === "fulfilled" && r.value.result.isErr())) {
+      const fulfilledResult = r as PromiseFulfilledResult<{ id: number; result: Result<boolean, AppError> }>;
+      if (fulfilledResult.value.result.isErr()) {
+        errors.push(fulfilledResult.value.result.error);
+      }
+    }
+
+    // Collect errors from rejected promises
+    for (const r of results.filter((r) => r.status === "rejected")) {
+      const rejectedResult = r as PromiseRejectedResult;
+      errors.push(
+        ErrorFactory.database(
+          "Operation failed",
+          rejectedResult.reason instanceof Error ? rejectedResult.reason : new Error(String(rejectedResult.reason)),
+        ),
       );
+    }
 
     return ok({
       successful,

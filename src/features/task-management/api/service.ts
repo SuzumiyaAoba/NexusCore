@@ -14,11 +14,7 @@ import * as TaskBusinessLogic from "./task-business-logic";
 import * as TaskValidationService from "./task-validation-service";
 
 export class TaskService {
-  private readonly bulkOperationService: BulkOperationService;
-
-  constructor(private readonly taskRepository: TaskRepository) {
-    this.bulkOperationService = new BulkOperationService(this);
-  }
+  constructor(private readonly taskRepository: TaskRepository) {}
 
   async createTask(taskData: CreateTaskRequest, createdBy: number): Promise<Result<Task, AppError>> {
     try {
@@ -177,7 +173,8 @@ export class TaskService {
     ids: number[],
     taskData: UpdateTaskRequest,
   ): Promise<Result<{ updated: number; failed: number; errors: AppError[] }, AppError>> {
-    const result = await this.bulkOperationService.bulkUpdate(ids, taskData);
+    const bulkOperationService = new BulkOperationService(this);
+    const result = await bulkOperationService.bulkUpdate(ids, taskData);
     return result.map((data) => ({
       updated: data.successful,
       failed: data.failed,
@@ -188,7 +185,8 @@ export class TaskService {
   async bulkDeleteTasks(
     ids: number[],
   ): Promise<Result<{ deleted: number; failed: number; errors: AppError[] }, AppError>> {
-    const result = await this.bulkOperationService.bulkDelete(ids);
+    const bulkOperationService = new BulkOperationService(this);
+    const result = await bulkOperationService.bulkDelete(ids);
     return result.map((data) => ({
       deleted: data.successful,
       failed: data.failed,

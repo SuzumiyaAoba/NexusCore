@@ -3,9 +3,9 @@ import type { z } from "zod";
 
 declare module "hono" {
   interface ContextVariableMap {
-    validatedBody: any;
-    validatedQuery: any;
-    validatedParam: any;
+    validatedBody: unknown;
+    validatedQuery: unknown;
+    validatedParam: unknown;
   }
 }
 
