@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { check, index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { categories } from "./category-schema";
 import { projects } from "./project-schema";
 import { tags } from "./tag-schema";
@@ -40,6 +40,20 @@ export const tasks = sqliteTable(
     updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => ({
+    // Check constraints for enum fields
+    statusCheck: check("chk_tasks_status", sql`${table.status} IN ('TODO', 'DOING', 'PENDING', 'DONE')`),
+    priorityCheck: check("chk_tasks_priority", sql`${table.priority} IN ('low', 'medium', 'high')`),
+    assignmentStatusCheck: check(
+      "chk_tasks_assignment_status",
+      sql`${table.assignmentStatus} IS NULL OR ${table.assignmentStatus} IN ('pending', 'accepted', 'rejected')`,
+    ),
+    progressCheck: check("chk_tasks_progress", sql`${table.progress} >= 0 AND ${table.progress} <= 100`),
+    eisenhowerQuadrantCheck: check("chk_tasks_eisenhower_quadrant", sql`${table.eisenhowerQuadrant} BETWEEN 1 AND 4`),
+    estimatedTimeCheck: check(
+      "chk_tasks_estimated_time",
+      sql`${table.estimatedTime} IS NULL OR ${table.estimatedTime} > 0`,
+    ),
+    // Indexes
     statusIdx: index("idx_tasks_status").on(table.status),
     importanceIdx: index("idx_tasks_importance").on(table.importance),
     urgencyIdx: index("idx_tasks_urgency").on(table.urgency),
@@ -99,6 +113,12 @@ export const taskAssignments = sqliteTable(
     createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   },
   (table) => ({
+    // Check constraints for enum fields
+    statusCheck: check(
+      "chk_task_assignments_status",
+      sql`${table.status} IN ('pending', 'accepted', 'rejected', 'completed')`,
+    ),
+    // Indexes
     assigneeIdx: index("idx_task_assignments_assignee").on(table.assigneeId),
     assignerIdx: index("idx_task_assignments_assigner").on(table.assignerId),
     statusIdx: index("idx_task_assignments_status").on(table.status),

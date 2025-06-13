@@ -22,6 +22,13 @@
       "when": 1749812762257,
       "tag": "0002_funny_vertigo",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "9",
+      "when": 1749827088718,
+      "tag": "0003_crazy_rogue",
+      "breakpoints": true
     }
   ]
 }
