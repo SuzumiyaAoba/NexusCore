@@ -24,8 +24,8 @@ export class TaskService {
       }
 
       const eisenhowerQuadrant = TaskBusinessLogic.calculateEisenhowerQuadrant(
-        validationResult.value.importance || false,
-        validationResult.value.urgency || false,
+        validationResult.value.importance ?? false,
+        validationResult.value.urgency ?? false,
       );
 
       const task = await this.taskRepository.create({
