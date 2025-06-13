@@ -553,7 +553,7 @@ describe("Task Management API", () => {
 
       // Restore the task
       const restoreResponse = await app.request(`/api/tasks/${createdTask.id}/restore`, {
-        method: "PUT",
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: "{}",
       });
