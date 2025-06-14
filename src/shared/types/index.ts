@@ -11,6 +11,7 @@ import type {
   Project as DbProject,
   Tag as DbTag,
   Task as DbTask,
+  TaskComment as DbTaskComment,
   TaskTimeLog as DbTaskTimeLog,
   User as DbUser,
 } from "../lib/db/schema";
@@ -21,6 +22,7 @@ export type Tag = DbTag;
 export type Project = DbProject;
 export type Task = DbTask;
 export type TaskTimeLog = DbTaskTimeLog;
+export type TaskComment = DbTaskComment;
 
 // API request/response types
 export interface CreateUserRequest {
@@ -96,6 +98,23 @@ export interface TimeLogQuery {
   offset?: number;
 }
 
+export interface CreateCommentRequest {
+  content: string;
+}
+
+export interface UpdateCommentRequest {
+  content?: string;
+}
+
+export interface CommentQuery {
+  taskId?: number;
+  userId?: number;
+  sortBy?: string;
+  order?: "asc" | "desc";
+  limit?: number;
+  offset?: number;
+}
+
 // API response types with related data
 export interface TaskWithRelations extends Task {
   creator?: User;
@@ -119,6 +138,11 @@ export interface ProjectWithStats extends Project {
 }
 
 export interface TimeLogWithRelations extends TaskTimeLog {
+  task?: Task;
+  user?: User;
+}
+
+export interface CommentWithRelations extends TaskComment {
   task?: Task;
   user?: User;
 }
