@@ -11,6 +11,8 @@ import type {
   Project as DbProject,
   Tag as DbTag,
   Task as DbTask,
+  TaskComment as DbTaskComment,
+  TaskTimeLog as DbTaskTimeLog,
   User as DbUser,
 } from "../lib/db/schema";
 
@@ -19,6 +21,8 @@ export type Category = DbCategory;
 export type Tag = DbTag;
 export type Project = DbProject;
 export type Task = DbTask;
+export type TaskTimeLog = DbTaskTimeLog;
+export type TaskComment = DbTaskComment;
 
 // API request/response types
 export interface CreateUserRequest {
@@ -72,6 +76,45 @@ export interface UpdateTaskRequest {
   dueDate?: string | null | undefined;
 }
 
+export interface CreateTimeLogRequest {
+  description?: string | undefined;
+}
+
+export interface UpdateTimeLogRequest {
+  endedAt?: string | undefined;
+  description?: string | undefined;
+}
+
+export interface TimeLogQuery {
+  taskId?: number;
+  userId?: number;
+  startFrom?: string;
+  startTo?: string;
+  endFrom?: string;
+  endTo?: string;
+  sortBy?: string;
+  order?: "asc" | "desc";
+  limit?: number;
+  offset?: number;
+}
+
+export interface CreateCommentRequest {
+  content: string;
+}
+
+export interface UpdateCommentRequest {
+  content?: string;
+}
+
+export interface CommentQuery {
+  taskId?: number;
+  userId?: number;
+  sortBy?: string;
+  order?: "asc" | "desc";
+  limit?: number;
+  offset?: number;
+}
+
 // API response types with related data
 export interface TaskWithRelations extends Task {
   creator?: User;
@@ -92,6 +135,16 @@ export interface ProjectWithStats extends Project {
   taskCount?: number;
   completedTaskCount?: number;
   owner?: User;
+}
+
+export interface TimeLogWithRelations extends TaskTimeLog {
+  task?: Task;
+  user?: User;
+}
+
+export interface CommentWithRelations extends TaskComment {
+  task?: Task;
+  user?: User;
 }
 
 // Error types

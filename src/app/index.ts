@@ -1,4 +1,6 @@
+import { setupCommentRoutes } from "@/features/comments/api/routes-typed";
 import { setupTaskRoutes } from "@/features/task-management/api/routes-typed";
+import { setupTimeTrackingRoutes } from "@/features/time-tracking/api/routes-typed";
 import { setupUserRoutes } from "@/features/user-management/api/routes-typed";
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
@@ -41,6 +43,8 @@ app.onError((err, c) => {
 // Register typed routes
 setupTaskRoutes(app);
 setupUserRoutes(app);
+setupTimeTrackingRoutes(app);
+setupCommentRoutes(app);
 // Basic API documentation endpoint
 app.get(
   "/openapi",
