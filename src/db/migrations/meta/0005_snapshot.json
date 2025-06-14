@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6a4bcbdd-0600-4fb4-8a4d-abf0f0000bb6",
-  "prevId": "793ab020-2872-4c04-8885-08813f1cf34c",
+  "id": "99052948-c132-4f62-b789-0e5ca165b0dc",
+  "prevId": "e778ebc6-db73-410e-8186-8914340d9c94",
   "tables": {
     "users": {
       "name": "users",
@@ -365,6 +365,226 @@
         }
       }
     },
+    "task_attachments": {
+      "name": "task_attachments",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "task_id": {
+          "name": "task_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "uploaded_by": {
+          "name": "uploaded_by",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "file_name": {
+          "name": "file_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "file_size": {
+          "name": "file_size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "file_type": {
+          "name": "file_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "file_path": {
+          "name": "file_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "uploaded_at": {
+          "name": "uploaded_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "idx_task_attachments_task": {
+          "name": "idx_task_attachments_task",
+          "columns": ["task_id"],
+          "isUnique": false
+        },
+        "idx_task_attachments_uploaded_by": {
+          "name": "idx_task_attachments_uploaded_by",
+          "columns": ["uploaded_by"],
+          "isUnique": false
+        },
+        "idx_task_attachments_uploaded_at": {
+          "name": "idx_task_attachments_uploaded_at",
+          "columns": ["uploaded_at"],
+          "isUnique": false
+        },
+        "idx_task_attachments_task_uploaded_at": {
+          "name": "idx_task_attachments_task_uploaded_at",
+          "columns": ["task_id", "uploaded_at"],
+          "isUnique": false
+        },
+        "idx_task_attachments_file_name": {
+          "name": "idx_task_attachments_file_name",
+          "columns": ["file_name"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "task_attachments_task_id_tasks_id_fk": {
+          "name": "task_attachments_task_id_tasks_id_fk",
+          "tableFrom": "task_attachments",
+          "tableTo": "tasks",
+          "columnsFrom": ["task_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "task_attachments_uploaded_by_users_id_fk": {
+          "name": "task_attachments_uploaded_by_users_id_fk",
+          "tableFrom": "task_attachments",
+          "tableTo": "users",
+          "columnsFrom": ["uploaded_by"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "chk_task_attachments_filename_length": {
+          "name": "chk_task_attachments_filename_length",
+          "value": "LENGTH(\"task_attachments\".\"file_name\") >= 1 AND LENGTH(\"task_attachments\".\"file_name\") <= 255"
+        },
+        "chk_task_attachments_file_size": {
+          "name": "chk_task_attachments_file_size",
+          "value": "\"task_attachments\".\"file_size\" > 0"
+        }
+      }
+    },
+    "task_comments": {
+      "name": "task_comments",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "task_id": {
+          "name": "task_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "idx_task_comments_task": {
+          "name": "idx_task_comments_task",
+          "columns": ["task_id"],
+          "isUnique": false
+        },
+        "idx_task_comments_user": {
+          "name": "idx_task_comments_user",
+          "columns": ["user_id"],
+          "isUnique": false
+        },
+        "idx_task_comments_created_at": {
+          "name": "idx_task_comments_created_at",
+          "columns": ["created_at"],
+          "isUnique": false
+        },
+        "idx_task_comments_task_created_at": {
+          "name": "idx_task_comments_task_created_at",
+          "columns": ["task_id", "created_at"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "task_comments_task_id_tasks_id_fk": {
+          "name": "task_comments_task_id_tasks_id_fk",
+          "tableFrom": "task_comments",
+          "tableTo": "tasks",
+          "columnsFrom": ["task_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "task_comments_user_id_users_id_fk": {
+          "name": "task_comments_user_id_users_id_fk",
+          "tableFrom": "task_comments",
+          "tableTo": "users",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "chk_task_comments_content_length": {
+          "name": "chk_task_comments_content_length",
+          "value": "LENGTH(\"task_comments\".\"content\") >= 1 AND LENGTH(\"task_comments\".\"content\") <= 1000"
+        }
+      }
+    },
     "task_history": {
       "name": "task_history",
       "columns": {
@@ -491,6 +711,123 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
+    },
+    "task_time_logs": {
+      "name": "task_time_logs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "task_id": {
+          "name": "task_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ended_at": {
+          "name": "ended_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "duration": {
+          "name": "duration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "idx_task_time_logs_task": {
+          "name": "idx_task_time_logs_task",
+          "columns": ["task_id"],
+          "isUnique": false
+        },
+        "idx_task_time_logs_user": {
+          "name": "idx_task_time_logs_user",
+          "columns": ["user_id"],
+          "isUnique": false
+        },
+        "idx_task_time_logs_started_at": {
+          "name": "idx_task_time_logs_started_at",
+          "columns": ["started_at"],
+          "isUnique": false
+        },
+        "idx_task_time_logs_ended_at": {
+          "name": "idx_task_time_logs_ended_at",
+          "columns": ["ended_at"],
+          "isUnique": false
+        },
+        "idx_task_time_logs_task_user": {
+          "name": "idx_task_time_logs_task_user",
+          "columns": ["task_id", "user_id"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "task_time_logs_task_id_tasks_id_fk": {
+          "name": "task_time_logs_task_id_tasks_id_fk",
+          "tableFrom": "task_time_logs",
+          "tableTo": "tasks",
+          "columnsFrom": ["task_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "task_time_logs_user_id_users_id_fk": {
+          "name": "task_time_logs_user_id_users_id_fk",
+          "tableFrom": "task_time_logs",
+          "tableTo": "users",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "chk_task_time_logs_duration": {
+          "name": "chk_task_time_logs_duration",
+          "value": "\"task_time_logs\".\"duration\" IS NULL OR \"task_time_logs\".\"duration\" >= 0"
+        }
+      }
     },
     "tasks": {
       "name": "tasks",

@@ -1,3 +1,5 @@
+import { setupAttachmentRoutes } from "@/features/attachments/api/routes-typed";
+import { setupCommentRoutes } from "@/features/comments/api/routes-typed";
 import { setupTaskRoutes } from "@/features/task-management/api/routes-typed";
 import { setupTimeTrackingRoutes } from "@/features/time-tracking/api/routes-typed";
 import { setupUserRoutes } from "@/features/user-management/api/routes-typed";
@@ -43,6 +45,8 @@ app.onError((err, c) => {
 setupTaskRoutes(app);
 setupUserRoutes(app);
 setupTimeTrackingRoutes(app);
+setupCommentRoutes(app);
+setupAttachmentRoutes(app);
 // Basic API documentation endpoint
 app.get(
   "/openapi",
