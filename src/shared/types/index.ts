@@ -11,6 +11,7 @@ import type {
   Project as DbProject,
   Tag as DbTag,
   Task as DbTask,
+  TaskComment as DbTaskComment,
   User as DbUser,
 } from "../lib/db/schema";
 
@@ -19,6 +20,7 @@ export type Category = DbCategory;
 export type Tag = DbTag;
 export type Project = DbProject;
 export type Task = DbTask;
+export type TaskComment = DbTaskComment;
 
 // API request/response types
 export interface CreateUserRequest {
