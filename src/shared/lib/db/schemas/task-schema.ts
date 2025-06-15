@@ -198,7 +198,6 @@ export const taskComments = sqliteTable(
     taskCreatedAtIdx: index("idx_task_comments_task_created_at").on(table.taskId, table.createdAt),
   }),
 );
-
 export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
 export type TaskTag = typeof taskTags.$inferSelect;
