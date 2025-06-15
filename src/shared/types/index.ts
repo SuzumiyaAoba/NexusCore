@@ -20,6 +20,16 @@ export type Tag = DbTag;
 export type Project = DbProject;
 export type Task = DbTask;
 
+// TaskComment type will be available once the database schema PR is merged
+export interface TaskComment {
+  id: number;
+  taskId: number;
+  userId: number;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // API request/response types
 export interface CreateUserRequest {
   username: string;
@@ -72,6 +82,25 @@ export interface UpdateTaskRequest {
   dueDate?: string | null | undefined;
 }
 
+export interface CreateTaskCommentRequest {
+  taskId: number;
+  userId: number;
+  content: string;
+}
+
+export interface UpdateTaskCommentRequest {
+  content: string;
+}
+
+export interface TaskCommentQuery {
+  taskId?: number;
+  userId?: number;
+  limit?: number;
+  offset?: number;
+  sortBy?: "created_at" | "updated_at";
+  order?: "asc" | "desc";
+}
+
 // API response types with related data
 export interface TaskWithRelations extends Task {
   creator?: User;
@@ -81,6 +110,11 @@ export interface TaskWithRelations extends Task {
   tags?: Tag[];
   subtaskCount?: number;
   completedSubtaskCount?: number;
+}
+
+export interface TaskCommentWithRelations extends TaskComment {
+  user?: User;
+  task?: Task;
 }
 
 export interface UserWithStats extends User {
