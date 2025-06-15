@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "6a4bcbdd-0600-4fb4-8a4d-abf0f0000bb6",
-  "prevId": "793ab020-2872-4c04-8885-08813f1cf34c",
+  "id": "e55ae72a-b417-4410-9416-37cc1c3112df",
+  "prevId": "6a4bcbdd-0600-4fb4-8a4d-abf0f0000bb6",
   "tables": {
     "users": {
       "name": "users",
@@ -491,6 +491,123 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
+    },
+    "task_time_logs": {
+      "name": "task_time_logs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "task_id": {
+          "name": "task_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "started_at": {
+          "name": "started_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "ended_at": {
+          "name": "ended_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "duration": {
+          "name": "duration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "idx_task_time_logs_task": {
+          "name": "idx_task_time_logs_task",
+          "columns": ["task_id"],
+          "isUnique": false
+        },
+        "idx_task_time_logs_user": {
+          "name": "idx_task_time_logs_user",
+          "columns": ["user_id"],
+          "isUnique": false
+        },
+        "idx_task_time_logs_started_at": {
+          "name": "idx_task_time_logs_started_at",
+          "columns": ["started_at"],
+          "isUnique": false
+        },
+        "idx_task_time_logs_ended_at": {
+          "name": "idx_task_time_logs_ended_at",
+          "columns": ["ended_at"],
+          "isUnique": false
+        },
+        "idx_task_time_logs_task_user": {
+          "name": "idx_task_time_logs_task_user",
+          "columns": ["task_id", "user_id"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "task_time_logs_task_id_tasks_id_fk": {
+          "name": "task_time_logs_task_id_tasks_id_fk",
+          "tableFrom": "task_time_logs",
+          "tableTo": "tasks",
+          "columnsFrom": ["task_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "task_time_logs_user_id_users_id_fk": {
+          "name": "task_time_logs_user_id_users_id_fk",
+          "tableFrom": "task_time_logs",
+          "tableTo": "users",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {
+        "chk_task_time_logs_duration": {
+          "name": "chk_task_time_logs_duration",
+          "value": "\"task_time_logs\".\"duration\" IS NULL OR \"task_time_logs\".\"duration\" >= 0"
+        }
+      }
     },
     "tasks": {
       "name": "tasks",
