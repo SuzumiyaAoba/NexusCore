@@ -93,6 +93,7 @@ export interface TaskWithRelations extends Task {
   tags?: Tag[];
   subtaskCount?: number;
   completedSubtaskCount?: number;
+  commentCount?: number;
 }
 
 export interface UserWithStats extends User {

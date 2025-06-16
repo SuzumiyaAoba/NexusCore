@@ -1,6 +1,6 @@
 import { and, eq, isNull, sql } from "drizzle-orm";
 import { db } from "../../../shared/config/database";
-import { type User as DbUser, tags, taskTags, tasks, users } from "../../../shared/lib/db/schema";
+import { type User as DbUser, tags, taskComments, taskTags, tasks, users } from "../../../shared/lib/db/schema";
 
 export class TaskRelationLoader {
   async loadAssignee(assignedTo: number | null): Promise<DbUser | null> {
@@ -82,5 +82,35 @@ export class TaskRelationLoader {
         ),
       )
       .groupBy(tasks.parentId);
+  }
+
+  async loadCommentCount(taskId: number): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(taskComments)
+      .where(and(eq(taskComments.taskId, taskId), isNull(taskComments.deletedAt)));
+
+    return result?.count || 0;
+  }
+
+  async loadCommentCountsBatch(taskIds: number[]) {
+    if (taskIds.length === 0) return [];
+
+    return db
+      .select({
+        taskId: taskComments.taskId,
+        count: sql<number>`COUNT(*)`,
+      })
+      .from(taskComments)
+      .where(
+        and(
+          sql`${taskComments.taskId} IN (${sql.join(
+            taskIds.map((id) => sql`${id}`),
+            sql`, `,
+          )})`,
+          isNull(taskComments.deletedAt),
+        ),
+      )
+      .groupBy(taskComments.taskId);
   }
 }
