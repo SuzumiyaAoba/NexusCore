@@ -372,4 +372,89 @@ describe("TaskCommentService", () => {
       expect(comments[0].replyCount).toBe(1);
     });
   });
+
+  describe("restoreComment", () => {
+    test("should restore deleted comment", async () => {
+      const mockCommentRepo = createMockCommentRepository();
+      const mockTaskRepo = createMockTaskRepository();
+
+      const mockDeletedComment: TaskComment = {
+        id: 1,
+        taskId: 1,
+        userId: 1,
+        content: "Deleted comment",
+        parentId: null,
+        deletedAt: "2024-01-01T01:00:00Z",
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-01T01:00:00Z",
+      };
+
+      const mockRestoredComment: TaskComment = {
+        ...mockDeletedComment,
+        deletedAt: null,
+        updatedAt: "2024-01-01T02:00:00Z",
+      };
+
+      mockCommentRepo.findById.mockResolvedValueOnce(mockDeletedComment);
+      mockCommentRepo.restore.mockResolvedValue(true);
+      mockCommentRepo.findById.mockResolvedValueOnce(mockRestoredComment);
+
+      const service = new TaskCommentService(mockCommentRepo, mockTaskRepo);
+
+      const result = await service.restoreComment(1, 1);
+
+      expect(result.isOk()).toBe(true);
+      expect(result._unsafeUnwrap().deletedAt).toBeNull();
+    });
+
+    test("should return error when trying to restore non-deleted comment", async () => {
+      const mockCommentRepo = createMockCommentRepository();
+      const mockTaskRepo = createMockTaskRepository();
+
+      const mockComment: TaskComment = {
+        id: 1,
+        taskId: 1,
+        userId: 1,
+        content: "Active comment",
+        parentId: null,
+        deletedAt: null, // Not deleted
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-01T00:00:00Z",
+      };
+
+      mockCommentRepo.findById.mockResolvedValue(mockComment);
+
+      const service = new TaskCommentService(mockCommentRepo, mockTaskRepo);
+
+      const result = await service.restoreComment(1, 1);
+
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr().code).toBe("VALIDATION_ERROR");
+    });
+
+    test("should return error for unauthorized restore", async () => {
+      const mockCommentRepo = createMockCommentRepository();
+      const mockTaskRepo = createMockTaskRepository();
+
+      const mockDeletedComment: TaskComment = {
+        id: 1,
+        taskId: 1,
+        userId: 2, // Different user
+        content: "Deleted comment",
+        parentId: null,
+        deletedAt: "2024-01-01T01:00:00Z",
+        createdAt: "2024-01-01T00:00:00Z",
+        updatedAt: "2024-01-01T01:00:00Z",
+      };
+
+      mockCommentRepo.findById.mockResolvedValue(mockDeletedComment);
+
+      const service = new TaskCommentService(mockCommentRepo, mockTaskRepo);
+
+      const result = await service.restoreComment(1, 1); // User 1 trying to restore user 2's comment
+
+      expect(result.isErr()).toBe(true);
+      expect(result._unsafeUnwrapErr().code).toBe("AUTHORIZATION_ERROR");
+    });
+  });
 });

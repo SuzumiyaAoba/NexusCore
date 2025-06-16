@@ -150,9 +150,14 @@ export class TaskCommentService {
         return err(ErrorFactory.authorization("You can only restore your own comments"));
       }
 
+      // Check if comment is actually deleted
+      if (!TaskCommentDomain.isCommentDeleted(existingComment)) {
+        return err(ErrorFactory.validation("Comment is not deleted and cannot be restored"));
+      }
+
       const restored = await this.commentRepository.restore(id);
       if (!restored) {
-        return err(ErrorFactory.notFound("Comment", id));
+        return err(ErrorFactory.validation("Comment could not be restored"));
       }
 
       const restoredComment = await this.commentRepository.findById(id);

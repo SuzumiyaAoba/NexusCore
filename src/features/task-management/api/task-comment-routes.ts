@@ -11,6 +11,19 @@ const taskRepository = new TaskRepository();
 const commentRepository = new TaskCommentRepository();
 const commentService = new TaskCommentService(commentRepository, taskRepository);
 
+// Helper function to validate user ID from header
+const getUserIdFromHeader = (c: any): number => {
+  const userIdHeader = c.req.header("x-user-id");
+  if (!userIdHeader) {
+    throw new Error("x-user-id header is required");
+  }
+  const userId = Number.parseInt(userIdHeader);
+  if (Number.isNaN(userId) || userId <= 0) {
+    throw new Error("Invalid x-user-id header");
+  }
+  return userId;
+};
+
 const createCommentSchema = z.object({
   content: z.string().min(1).max(2000),
   parentId: z.number().int().positive().optional(),
@@ -51,25 +64,31 @@ export const setupTaskCommentRoutes = (app: Hono) => {
     zValidator("param", taskIdParamSchema),
     zValidator("json", createCommentSchema),
     async (c) => {
-      const { taskId } = c.req.valid("param");
-      const commentData = c.req.valid("json");
-      const userIdHeader = c.req.header("x-user-id");
-      const userId = userIdHeader ? Number.parseInt(userIdHeader) : 1;
+      try {
+        const { taskId } = c.req.valid("param");
+        const commentData = c.req.valid("json");
+        const userId = getUserIdFromHeader(c);
 
-      const result = await commentService.createComment(
-        {
-          taskId,
-          content: commentData.content,
-          parentId: commentData.parentId,
-        },
-        userId,
-      );
+        const result = await commentService.createComment(
+          {
+            taskId,
+            content: commentData.content,
+            parentId: commentData.parentId,
+          },
+          userId,
+        );
 
-      if (result.isErr()) {
-        return handleResultError(c, result.error);
+        if (result.isErr()) {
+          return handleResultError(c, result.error);
+        }
+
+        return c.json(result.value, 201);
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("x-user-id")) {
+          return c.json({ error: { code: "AUTHENTICATION_ERROR", message: error.message } }, 401);
+        }
+        return c.json({ error: { code: "INTERNAL_ERROR", message: "Internal server error" } }, 500);
       }
-
-      return c.json(result.value, 201);
     },
   );
 
@@ -125,18 +144,24 @@ export const setupTaskCommentRoutes = (app: Hono) => {
     zValidator("param", commentIdParamSchema),
     zValidator("json", updateCommentSchema),
     async (c) => {
-      const { commentId } = c.req.valid("param");
-      const updateData = c.req.valid("json");
-      const userIdHeader = c.req.header("x-user-id");
-      const userId = userIdHeader ? Number.parseInt(userIdHeader) : 1;
+      try {
+        const { commentId } = c.req.valid("param");
+        const updateData = c.req.valid("json");
+        const userId = getUserIdFromHeader(c);
 
-      const result = await commentService.updateComment(commentId, updateData, userId);
+        const result = await commentService.updateComment(commentId, updateData, userId);
 
-      if (result.isErr()) {
-        return handleResultError(c, result.error);
+        if (result.isErr()) {
+          return handleResultError(c, result.error);
+        }
+
+        return c.json(result.value);
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("x-user-id")) {
+          return c.json({ error: { code: "AUTHENTICATION_ERROR", message: error.message } }, 401);
+        }
+        return c.json({ error: { code: "INTERNAL_ERROR", message: "Internal server error" } }, 500);
       }
-
-      return c.json(result.value);
     },
   );
 
@@ -149,17 +174,23 @@ export const setupTaskCommentRoutes = (app: Hono) => {
     }),
     zValidator("param", commentIdParamSchema),
     async (c) => {
-      const { commentId } = c.req.valid("param");
-      const userIdHeader = c.req.header("x-user-id");
-      const userId = userIdHeader ? Number.parseInt(userIdHeader) : 1;
+      try {
+        const { commentId } = c.req.valid("param");
+        const userId = getUserIdFromHeader(c);
 
-      const result = await commentService.deleteComment(commentId, userId);
+        const result = await commentService.deleteComment(commentId, userId);
 
-      if (result.isErr()) {
-        return handleResultError(c, result.error);
+        if (result.isErr()) {
+          return handleResultError(c, result.error);
+        }
+
+        return c.body(null, 204);
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("x-user-id")) {
+          return c.json({ error: { code: "AUTHENTICATION_ERROR", message: error.message } }, 401);
+        }
+        return c.json({ error: { code: "INTERNAL_ERROR", message: "Internal server error" } }, 500);
       }
-
-      return c.body(null, 204);
     },
   );
 
@@ -172,17 +203,23 @@ export const setupTaskCommentRoutes = (app: Hono) => {
     }),
     zValidator("param", commentIdParamSchema),
     async (c) => {
-      const { commentId } = c.req.valid("param");
-      const userIdHeader = c.req.header("x-user-id");
-      const userId = userIdHeader ? Number.parseInt(userIdHeader) : 1;
+      try {
+        const { commentId } = c.req.valid("param");
+        const userId = getUserIdFromHeader(c);
 
-      const result = await commentService.restoreComment(commentId, userId);
+        const result = await commentService.restoreComment(commentId, userId);
 
-      if (result.isErr()) {
-        return handleResultError(c, result.error);
+        if (result.isErr()) {
+          return handleResultError(c, result.error);
+        }
+
+        return c.json(result.value);
+      } catch (error) {
+        if (error instanceof Error && error.message.includes("x-user-id")) {
+          return c.json({ error: { code: "AUTHENTICATION_ERROR", message: error.message } }, 401);
+        }
+        return c.json({ error: { code: "INTERNAL_ERROR", message: "Internal server error" } }, 500);
       }
-
-      return c.json(result.value);
     },
   );
 

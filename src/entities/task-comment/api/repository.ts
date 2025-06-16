@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db } from "../../../shared/config/database";
 import { taskComments, users } from "../../../shared/lib/db/schema";
 import type {
@@ -118,7 +118,7 @@ export class TaskCommentRepository {
         deletedAt: null,
         updatedAt: sql`CURRENT_TIMESTAMP`,
       })
-      .where(eq(taskComments.id, id))
+      .where(and(eq(taskComments.id, id), isNotNull(taskComments.deletedAt)))
       .returning();
 
     return result.length > 0;
