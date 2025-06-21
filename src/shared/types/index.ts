@@ -11,6 +11,7 @@ import type {
   Project as DbProject,
   Tag as DbTag,
   Task as DbTask,
+  TaskComment as DbTaskComment,
   TaskTimeLog as DbTaskTimeLog,
   User as DbUser,
 } from "../lib/db/schema";
@@ -20,6 +21,7 @@ export type Category = DbCategory;
 export type Tag = DbTag;
 export type Project = DbProject;
 export type Task = DbTask;
+export type TaskComment = DbTaskComment;
 export type TaskTimeLog = DbTaskTimeLog;
 
 // API request/response types
@@ -74,6 +76,16 @@ export interface UpdateTaskRequest {
   dueDate?: string | null | undefined;
 }
 
+export interface CreateTaskCommentRequest {
+  taskId: number;
+  content: string;
+  parentId?: number | undefined;
+}
+
+export interface UpdateTaskCommentRequest {
+  content: string;
+}
+
 // API response types with related data
 export interface TaskWithRelations extends Task {
   creator?: User;
@@ -83,6 +95,7 @@ export interface TaskWithRelations extends Task {
   tags?: Tag[];
   subtaskCount?: number;
   completedSubtaskCount?: number;
+  commentCount?: number;
 }
 
 export interface UserWithStats extends User {
@@ -94,6 +107,12 @@ export interface ProjectWithStats extends Project {
   taskCount?: number;
   completedTaskCount?: number;
   owner?: User;
+}
+
+export interface TaskCommentWithRelations extends TaskComment {
+  user?: User;
+  replies?: TaskCommentWithRelations[];
+  replyCount?: number;
 }
 
 // Error types

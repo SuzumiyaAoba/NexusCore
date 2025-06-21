@@ -1,4 +1,5 @@
 import { setupTaskRoutes } from "@/features/task-management/api/routes-typed";
+import { setupTaskCommentRoutes } from "@/features/task-management/api/task-comment-routes";
 import { setupUserRoutes } from "@/features/user-management/api/routes-typed";
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
@@ -40,6 +41,7 @@ app.onError((err, c) => {
 
 // Register typed routes
 setupTaskRoutes(app);
+setupTaskCommentRoutes(app);
 setupUserRoutes(app);
 // Basic API documentation endpoint
 app.get(

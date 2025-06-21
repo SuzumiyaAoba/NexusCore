@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**NexusCore** is a comprehensive TODO management API system built with modern TypeScript tooling. The system provides REST API endpoints for task management, including features like task assignments, time tracking, projects, categories, and extensive reporting capabilities.
+**NexusCore** is a comprehensive TODO management API system built with modern TypeScript tooling. The system provides REST API endpoints for task management, including features like task assignments, threaded comments, time tracking, projects, categories, and extensive reporting capabilities.
 
 ## Technology Stack
 
@@ -44,7 +44,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The codebase follows DDD principles with clean separation of concerns:
 
-- **`src/entities/`** - Domain models with business logic and repositories (User, Task)
+- **`src/entities/`** - Domain models with business logic and repositories (User, Task, TaskComment)
 - **`src/features/`** - Application services that orchestrate business operations (task-management, user-management)
 - **`src/shared/`** - Cross-cutting concerns (database, validation, error handling, API utilities)
 - **`src/app/`** - Application entry point and route configuration
@@ -92,10 +92,11 @@ export namespace TaskDomain {
 Sophisticated SQLite schema with Drizzle ORM providing:
 
 - **Type-safe queries**: Full compile-time type checking for all database operations
-- **Complex relationships**: Tasks with subtasks, assignments, tags, and dependencies
-- **Soft deletion**: Built-in trash/restore functionality for tasks
+- **Complex relationships**: Tasks with subtasks, assignments, tags, comments, and dependencies
+- **Soft deletion**: Built-in trash/restore functionality for tasks and comments
+- **Threaded comments**: Parent-child relationships for discussion threads
 - **Batch operations**: Efficient loading of related data
-- **Business rules**: Eisenhower Matrix auto-calculation, task status transitions
+- **Business rules**: Eisenhower Matrix auto-calculation, task status transitions, comment authorization
 
 ### Dependency Injection
 

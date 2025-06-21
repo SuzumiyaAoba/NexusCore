@@ -40,6 +40,7 @@ export function toTaskWithRelations(
     tags?: Array<{ id: number; name: string; color: string | null; createdAt: string }>;
     subtaskCount?: number;
     completedSubtaskCount?: number;
+    commentCount?: number;
   },
 ): TaskWithRelations {
   const task = toTask(dbTask);
@@ -59,5 +60,6 @@ export function toTaskWithRelations(
     tags: relations.tags || [],
     subtaskCount: relations.subtaskCount || 0,
     completedSubtaskCount: relations.completedSubtaskCount || 0,
+    commentCount: relations.commentCount || 0,
   };
 }
