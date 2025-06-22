@@ -12,6 +12,7 @@ import type {
   Tag as DbTag,
   Task as DbTask,
   TaskComment as DbTaskComment,
+  TaskTimeLog as DbTaskTimeLog,
   User as DbUser,
 } from "../lib/db/schema";
 
@@ -21,6 +22,7 @@ export type Tag = DbTag;
 export type Project = DbProject;
 export type Task = DbTask;
 export type TaskComment = DbTaskComment;
+export type TaskTimeLog = DbTaskTimeLog;
 
 // API request/response types
 export interface CreateUserRequest {

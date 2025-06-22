@@ -143,6 +143,34 @@ export const taskHistory = sqliteTable(
   }),
 );
 
+export const taskTimeLogs = sqliteTable(
+  "task_time_logs",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    taskId: integer("task_id")
+      .notNull()
+      .references(() => tasks.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    startedAt: text("started_at").notNull(),
+    endedAt: text("ended_at"),
+    duration: integer("duration"), // 秒数、自動計算
+    description: text("description"),
+    createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  },
+  (table) => ({
+    // Check constraints
+    durationCheck: check("chk_task_time_logs_duration", sql`${table.duration} IS NULL OR ${table.duration} >= 0`),
+    // Indexes
+    taskIdx: index("idx_task_time_logs_task").on(table.taskId),
+    userIdx: index("idx_task_time_logs_user").on(table.userId),
+    startedAtIdx: index("idx_task_time_logs_started_at").on(table.startedAt),
+    endedAtIdx: index("idx_task_time_logs_ended_at").on(table.endedAt),
+    taskUserIdx: index("idx_task_time_logs_task_user").on(table.taskId, table.userId),
+  }),
+);
+
 export const taskComments = sqliteTable(
   "task_comments",
   {
@@ -170,7 +198,6 @@ export const taskComments = sqliteTable(
     taskCreatedAtIdx: index("idx_task_comments_task_created_at").on(table.taskId, table.createdAt),
   }),
 );
-
 export type Task = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
 export type TaskTag = typeof taskTags.$inferSelect;
@@ -179,5 +206,7 @@ export type TaskAssignment = typeof taskAssignments.$inferSelect;
 export type NewTaskAssignment = typeof taskAssignments.$inferInsert;
 export type TaskHistory = typeof taskHistory.$inferSelect;
 export type NewTaskHistory = typeof taskHistory.$inferInsert;
+export type TaskTimeLog = typeof taskTimeLogs.$inferSelect;
+export type NewTaskTimeLog = typeof taskTimeLogs.$inferInsert;
 export type TaskComment = typeof taskComments.$inferSelect;
 export type NewTaskComment = typeof taskComments.$inferInsert;
