@@ -1,12 +1,13 @@
 import { type Result, err, ok } from "neverthrow";
 import { z } from "zod";
 import { type AppError, ErrorFactory } from "../../../shared/lib/errors/enhanced";
+import type { CreateTaskCommentRequest, TaskCommentQuery, UpdateTaskCommentRequest } from "../../../shared/types";
 import {
-  createTaskCommentRequestSchema,
+  createTaskCommentSchema,
   taskCommentIdSchema,
-  updateTaskCommentRequestSchema,
+  taskCommentQuerySchema,
+  updateTaskCommentSchema,
 } from "./validation-schemas";
-import type { CreateTaskCommentRequest, UpdateTaskCommentRequest } from "./validation-schemas";
 
 function handleZodError(error: unknown, fallbackMessage: string): Result<never, AppError> {
   if (error instanceof z.ZodError) {
@@ -17,17 +18,17 @@ function handleZodError(error: unknown, fallbackMessage: string): Result<never, 
 }
 
 export function validateCreate(data: unknown): Result<CreateTaskCommentRequest, AppError> {
-  const result = createTaskCommentRequestSchema.safeParse(data);
+  const result = createTaskCommentSchema.safeParse(data);
   if (!result.success) {
-    return handleZodError(result.error, "Invalid comment creation data");
+    return handleZodError(result.error, "Invalid task comment data");
   }
   return ok(result.data);
 }
 
 export function validateUpdate(data: unknown): Result<UpdateTaskCommentRequest, AppError> {
-  const result = updateTaskCommentRequestSchema.safeParse(data);
+  const result = updateTaskCommentSchema.safeParse(data);
   if (!result.success) {
-    return handleZodError(result.error, "Invalid comment update data");
+    return handleZodError(result.error, "Invalid task comment update data");
   }
   return ok(result.data);
 }
@@ -35,7 +36,15 @@ export function validateUpdate(data: unknown): Result<UpdateTaskCommentRequest, 
 export function validateId(id: unknown): Result<number, AppError> {
   const result = taskCommentIdSchema.safeParse(id);
   if (!result.success) {
-    return handleZodError(result.error, "Invalid comment ID");
+    return handleZodError(result.error, "Invalid task comment ID");
+  }
+  return ok(result.data);
+}
+
+export function validateQuery(query: unknown): Result<TaskCommentQuery, AppError> {
+  const result = taskCommentQuerySchema.safeParse(query);
+  if (!result.success) {
+    return handleZodError(result.error, "Invalid task comment query parameters");
   }
   return ok(result.data);
 }

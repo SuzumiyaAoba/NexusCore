@@ -86,6 +86,15 @@ export interface UpdateTaskCommentRequest {
   content: string;
 }
 
+export interface TaskCommentQuery {
+  taskId?: number;
+  userId?: number;
+  limit?: number;
+  offset?: number;
+  sortBy?: "created_at" | "updated_at";
+  order?: "asc" | "desc";
+}
+
 // API response types with related data
 export interface TaskWithRelations extends Task {
   creator?: User;
@@ -98,6 +107,13 @@ export interface TaskWithRelations extends Task {
   commentCount?: number;
 }
 
+export interface TaskCommentWithRelations extends TaskComment {
+  user?: User;
+  task?: Task;
+  replies?: TaskCommentWithRelations[];
+  replyCount?: number;
+}
+
 export interface UserWithStats extends User {
   taskCount?: number;
   completedTaskCount?: number;
@@ -107,12 +123,6 @@ export interface ProjectWithStats extends Project {
   taskCount?: number;
   completedTaskCount?: number;
   owner?: User;
-}
-
-export interface TaskCommentWithRelations extends TaskComment {
-  user?: User;
-  replies?: TaskCommentWithRelations[];
-  replyCount?: number;
 }
 
 // Error types
