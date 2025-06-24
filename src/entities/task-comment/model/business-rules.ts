@@ -1,3 +1,5 @@
+import type { TaskComment } from "../../../shared/lib/db/schema";
+
 export function isValidContent(content: string): boolean {
   return content.trim().length >= 1 && content.length <= 1000;
 }
@@ -16,4 +18,20 @@ export function isCommentEditable(createdAt: string, maxEditTimeHours = 24): boo
 
 export function sanitizeContent(content: string): string {
   return content.trim();
+}
+
+export function canEditComment(comment: TaskComment, userId: number): boolean {
+  return comment.userId === userId;
+}
+
+export function canDeleteComment(comment: TaskComment, userId: number): boolean {
+  return comment.userId === userId;
+}
+
+export function isCommentDeleted(comment: TaskComment): boolean {
+  return comment.deletedAt !== null;
+}
+
+export function isReplyToComment(comment: TaskComment): boolean {
+  return comment.parentId !== null;
 }

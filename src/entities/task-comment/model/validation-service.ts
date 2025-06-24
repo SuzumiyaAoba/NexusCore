@@ -18,37 +18,33 @@ function handleZodError(error: unknown, fallbackMessage: string): Result<never, 
 }
 
 export function validateCreate(data: unknown): Result<CreateTaskCommentRequest, AppError> {
-  try {
-    const validated = createTaskCommentSchema.parse(data);
-    return ok(validated);
-  } catch (error) {
-    return handleZodError(error, "Invalid task comment data");
+  const result = createTaskCommentSchema.safeParse(data);
+  if (!result.success) {
+    return handleZodError(result.error, "Invalid task comment data");
   }
+  return ok(result.data);
 }
 
 export function validateUpdate(data: unknown): Result<UpdateTaskCommentRequest, AppError> {
-  try {
-    const validated = updateTaskCommentSchema.parse(data);
-    return ok(validated);
-  } catch (error) {
-    return handleZodError(error, "Invalid task comment update data");
+  const result = updateTaskCommentSchema.safeParse(data);
+  if (!result.success) {
+    return handleZodError(result.error, "Invalid task comment update data");
   }
+  return ok(result.data);
 }
 
 export function validateId(id: unknown): Result<number, AppError> {
-  try {
-    const validated = taskCommentIdSchema.parse(id);
-    return ok(validated);
-  } catch (error) {
-    return handleZodError(error, "Invalid task comment ID");
+  const result = taskCommentIdSchema.safeParse(id);
+  if (!result.success) {
+    return handleZodError(result.error, "Invalid task comment ID");
   }
+  return ok(result.data);
 }
 
 export function validateQuery(query: unknown): Result<TaskCommentQuery, AppError> {
-  try {
-    const validated = taskCommentQuerySchema.parse(query);
-    return ok(validated);
-  } catch (error) {
-    return handleZodError(error, "Invalid task comment query parameters");
+  const result = taskCommentQuerySchema.safeParse(query);
+  if (!result.success) {
+    return handleZodError(result.error, "Invalid task comment query parameters");
   }
+  return ok(result.data);
 }

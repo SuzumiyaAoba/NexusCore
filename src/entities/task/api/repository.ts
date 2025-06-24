@@ -98,10 +98,11 @@ export class TaskRepository {
 
     if (!task) return null;
 
-    const [assignee, taskTagsData, subtaskCounts] = await Promise.all([
+    const [assignee, taskTagsData, subtaskCounts, commentCount] = await Promise.all([
       this.relationLoader.loadAssignee(task.task.assignedTo),
       this.relationLoader.loadTaskTags(id),
       this.relationLoader.loadSubtaskCounts(id),
+      this.relationLoader.loadCommentCount(id),
     ]);
 
     return TaskMapper.toTaskWithRelations(task.task, {
@@ -111,6 +112,7 @@ export class TaskRepository {
       tags: taskTagsData,
       subtaskCount: Number(subtaskCounts?.total) || 0,
       completedSubtaskCount: Number(subtaskCounts?.completed) || 0,
+      commentCount,
     });
   }
 
@@ -230,15 +232,17 @@ export class TaskRepository {
     const taskIds = tasksResult.map((r) => r.task.id);
     const assigneeIds = tasksResult.map((r) => r.task.assignedTo).filter(Boolean) as number[];
 
-    const [assignees, allTaskTags, allSubtaskCounts] = await Promise.all([
+    const [assignees, allTaskTags, allSubtaskCounts, allCommentCounts] = await Promise.all([
       assigneeIds.length > 0 ? this.relationLoader.loadUsersByIds(assigneeIds) : Promise.resolve([]),
       this.relationLoader.loadTaskTagsBatch(taskIds),
       this.relationLoader.loadSubtaskCountsBatch(taskIds),
+      this.relationLoader.loadCommentCountsBatch(taskIds),
     ]);
 
     const assigneeMap = new Map<number, DbUser>(assignees.map((u) => [u.id, u]));
     const taskTagsMap = new Map<number, Array<{ id: number; name: string; color: string | null; createdAt: string }>>();
     const subtaskCountsMap = new Map<number, { total: unknown; completed: unknown }>();
+    const commentCountsMap = new Map<number, number>();
 
     for (const { taskId, tag } of allTaskTags) {
       if (!taskTagsMap.has(taskId)) taskTagsMap.set(taskId, []);
@@ -251,11 +255,16 @@ export class TaskRepository {
       }
     }
 
+    for (const { taskId, count } of allCommentCounts) {
+      commentCountsMap.set(taskId, count);
+    }
+
     return tasksResult.map((result) => {
       const task = result.task;
       const assignee = task.assignedTo ? assigneeMap.get(task.assignedTo) || null : null;
       const taskTags = taskTagsMap.get(task.id) || [];
       const subtaskCounts = subtaskCountsMap.get(task.id);
+      const commentCount = commentCountsMap.get(task.id) || 0;
 
       return TaskMapper.toTaskWithRelations(task, {
         creator: result.creator,
@@ -264,6 +273,7 @@ export class TaskRepository {
         tags: taskTags,
         subtaskCount: Number(subtaskCounts?.total) || 0,
         completedSubtaskCount: Number(subtaskCounts?.completed) || 0,
+        commentCount,
       });
     });
   }

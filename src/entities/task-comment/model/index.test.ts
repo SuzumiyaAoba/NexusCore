@@ -6,7 +6,6 @@ describe("TaskCommentDomain", () => {
     it("should validate valid task comment data", () => {
       const validData = {
         taskId: 1,
-        userId: 1,
         content: "This is a valid comment",
       };
 
@@ -20,7 +19,6 @@ describe("TaskCommentDomain", () => {
     it("should fail validation for empty content", () => {
       const invalidData = {
         taskId: 1,
-        userId: 1,
         content: "",
       };
 
@@ -34,7 +32,6 @@ describe("TaskCommentDomain", () => {
     it("should fail validation for content too long", () => {
       const invalidData = {
         taskId: 1,
-        userId: 1,
         content: "a".repeat(1001),
       };
 
@@ -48,18 +45,6 @@ describe("TaskCommentDomain", () => {
     it("should fail validation for invalid task ID", () => {
       const invalidData = {
         taskId: 0,
-        userId: 1,
-        content: "Valid content",
-      };
-
-      const result = TaskCommentDomain.validateCreate(invalidData);
-      expect(result.isErr()).toBe(true);
-    });
-
-    it("should fail validation for invalid user ID", () => {
-      const invalidData = {
-        taskId: 1,
-        userId: -1,
         content: "Valid content",
       };
 

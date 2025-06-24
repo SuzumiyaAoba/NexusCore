@@ -24,16 +24,6 @@ export type Task = DbTask;
 export type TaskComment = DbTaskComment;
 export type TaskTimeLog = DbTaskTimeLog;
 
-// TaskComment type will be available once the database schema PR is merged
-export interface TaskComment {
-  id: number;
-  taskId: number;
-  userId: number;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // API request/response types
 export interface CreateUserRequest {
   username: string;
@@ -88,8 +78,8 @@ export interface UpdateTaskRequest {
 
 export interface CreateTaskCommentRequest {
   taskId: number;
-  userId: number;
   content: string;
+  parentId?: number | undefined;
 }
 
 export interface UpdateTaskCommentRequest {
@@ -114,11 +104,14 @@ export interface TaskWithRelations extends Task {
   tags?: Tag[];
   subtaskCount?: number;
   completedSubtaskCount?: number;
+  commentCount?: number;
 }
 
 export interface TaskCommentWithRelations extends TaskComment {
   user?: User;
   task?: Task;
+  replies?: TaskCommentWithRelations[];
+  replyCount?: number;
 }
 
 export interface UserWithStats extends User {

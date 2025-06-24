@@ -21,6 +21,10 @@ export namespace TaskCommentDomain {
   export const canUserModifyComment = BusinessRules.canUserModifyComment;
   export const isCommentEditable = BusinessRules.isCommentEditable;
   export const sanitizeContent = BusinessRules.sanitizeContent;
+  export const canEditComment = BusinessRules.canEditComment;
+  export const canDeleteComment = BusinessRules.canDeleteComment;
+  export const isCommentDeleted = BusinessRules.isCommentDeleted;
+  export const isReplyToComment = BusinessRules.isReplyToComment;
 }
 
 export type { TaskComment, CreateTaskCommentRequest, UpdateTaskCommentRequest, TaskCommentQuery };

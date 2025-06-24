@@ -2,7 +2,7 @@
   "version": "6",
   "dialect": "sqlite",
   "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
-  "prevId": "e55ae72a-b417-4410-9416-37cc1c3112df",
+  "prevId": "6753f11e-a950-40f1-895d-9a32f1909637",
   "tables": {
     "users": {
       "name": "users",
@@ -609,105 +609,6 @@
         }
       }
     },
-    "task_comments": {
-      "name": "task_comments",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "task_id": {
-          "name": "task_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "content": {
-          "name": "content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "CURRENT_TIMESTAMP"
-        }
-      },
-      "indexes": {
-        "idx_task_comments_task": {
-          "name": "idx_task_comments_task",
-          "columns": ["task_id"],
-          "isUnique": false
-        },
-        "idx_task_comments_user": {
-          "name": "idx_task_comments_user",
-          "columns": ["user_id"],
-          "isUnique": false
-        },
-        "idx_task_comments_created_at": {
-          "name": "idx_task_comments_created_at",
-          "columns": ["created_at"],
-          "isUnique": false
-        },
-        "idx_task_comments_task_created_at": {
-          "name": "idx_task_comments_task_created_at",
-          "columns": ["task_id", "created_at"],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "task_comments_task_id_tasks_id_fk": {
-          "name": "task_comments_task_id_tasks_id_fk",
-          "tableFrom": "task_comments",
-          "tableTo": "tasks",
-          "columnsFrom": ["task_id"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "task_comments_user_id_users_id_fk": {
-          "name": "task_comments_user_id_users_id_fk",
-          "tableFrom": "task_comments",
-          "tableTo": "users",
-          "columnsFrom": ["user_id"],
-          "columnsTo": ["id"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {
-        "chk_task_comments_content_length": {
-          "name": "chk_task_comments_content_length",
-          "value": "LENGTH(\"task_comments\".\"content\") >= 1 AND LENGTH(\"task_comments\".\"content\") <= 1000"
-        }
-      }
-    },
     "tasks": {
       "name": "tasks",
       "columns": {
@@ -1066,6 +967,124 @@
           "value": "\"tasks\".\"estimated_time\" IS NULL OR \"tasks\".\"estimated_time\" > 0"
         }
       }
+    },
+    "task_comments": {
+      "name": "task_comments",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "task_id": {
+          "name": "task_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "parent_id": {
+          "name": "parent_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        }
+      },
+      "indexes": {
+        "idx_task_comments_task": {
+          "name": "idx_task_comments_task",
+          "columns": ["task_id"],
+          "isUnique": false
+        },
+        "idx_task_comments_user": {
+          "name": "idx_task_comments_user",
+          "columns": ["user_id"],
+          "isUnique": false
+        },
+        "idx_task_comments_parent": {
+          "name": "idx_task_comments_parent",
+          "columns": ["parent_id"],
+          "isUnique": false
+        },
+        "idx_task_comments_deleted_at": {
+          "name": "idx_task_comments_deleted_at",
+          "columns": ["deleted_at"],
+          "isUnique": false
+        },
+        "idx_task_comments_created_at": {
+          "name": "idx_task_comments_created_at",
+          "columns": ["created_at"],
+          "isUnique": false
+        },
+        "idx_task_comments_task_not_deleted": {
+          "name": "idx_task_comments_task_not_deleted",
+          "columns": ["task_id", "deleted_at"],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "task_comments_task_id_tasks_id_fk": {
+          "name": "task_comments_task_id_tasks_id_fk",
+          "tableFrom": "task_comments",
+          "tableTo": "tasks",
+          "columnsFrom": ["task_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "task_comments_user_id_users_id_fk": {
+          "name": "task_comments_user_id_users_id_fk",
+          "tableFrom": "task_comments",
+          "tableTo": "users",
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
     }
   },
   "views": {},

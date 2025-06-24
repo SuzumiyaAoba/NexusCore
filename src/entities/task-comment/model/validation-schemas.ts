@@ -2,11 +2,11 @@ import { z } from "zod";
 
 export const createTaskCommentSchema = z.object({
   taskId: z.number().int().positive(),
-  userId: z.number().int().positive(),
   content: z
     .string()
     .min(1, "Comment content cannot be empty")
     .max(1000, "Comment content cannot exceed 1000 characters"),
+  parentId: z.number().int().positive().optional(),
 });
 
 export const updateTaskCommentSchema = z.object({
