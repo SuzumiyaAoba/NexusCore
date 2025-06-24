@@ -13,8 +13,9 @@ A comprehensive TODO management API system built with modern TypeScript tooling.
 
 ### Comments & Collaboration  
 - **Threaded Comments**: Reply to comments with parent-child relationships
-- **Soft Deletion**: Comments can be deleted and restored
-- **User Authorization**: Users can only modify their own comments
+- **Soft Deletion**: Comments can be deleted and restored with full audit trail
+- **User Authorization**: Users can only modify their own comments with edit time limits
+- **Advanced Querying**: Filter, sort, and paginate comments with comprehensive query support
 - **Real-time Tracking**: Comment counts and threading support
 
 ### Organization & Classification
@@ -24,10 +25,11 @@ A comprehensive TODO management API system built with modern TypeScript tooling.
 - **Eisenhower Matrix**: Automatic priority quadrant calculation
 
 ### Advanced Features
-- **Time Tracking**: Record work sessions and duration
-- **Schedule Management**: Set start dates, end dates, and due dates
-- **Priority Management**: Importance and urgency-based prioritization
-- **Assignment Workflow**: Request, accept, and reject task assignments
+- **Time Tracking**: Record detailed work sessions with start/end times and duration calculations
+- **Schedule Management**: Set start dates, end dates, and due dates with validation
+- **Priority Management**: Importance and urgency-based prioritization with Eisenhower Matrix
+- **Assignment Workflow**: Request, accept, and reject task assignments with full audit trail
+- **Type Safety**: End-to-end TypeScript with functional error handling using Result pattern
 
 ## 🛠 Technology Stack
 
